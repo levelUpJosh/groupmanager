@@ -1,0 +1,45 @@
+.scoutred{
+    background-color: #e22e12;
+    color: white;
+}
+.scoutpurple{
+    color: white;
+    background-color: #7413dc;
+  }
+.scoutpurple-opacity{
+    background-color: rgba(116,19,220,0.75);
+    color: white;
+}
+.scoutgreen, .cubgreen{
+    color: white;
+    background-color: #23a950;
+}
+.scoutgreen-opacity{
+    background-color:rgba(35,169,80,0.75);
+    color: white;
+}
+.scoutblue, .beaverblue{
+    color: white;
+    background-color:  #006ddf;
+}
+.scoutblue a, .beaverblue a, .scoutgreen a, .cubgreen a,.scoutred a{
+    color: white;
+}
+
+
+.scoutonlygreen{
+    color: white;
+    background-color: #004851;
+}
+.scoutnavy, .explorernavy{
+    color: white;
+    background-color: #003982;
+}
+.scoutblack, .networkblack{
+    color: white;
+    background-color: black;
+}
+.white{
+    background-color: white;
+    color: black
+}

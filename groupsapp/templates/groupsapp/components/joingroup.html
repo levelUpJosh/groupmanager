@@ -1,0 +1,10 @@
+{% extends 'base.html'%}
+{% block content %}
+<div class="card scoutpurple">
+    <form action="{% url 'joingroup'%}" method="post" class="card-body">
+        {% csrf_token %}
+        {{form}}
+        <button type="submit" value="Submit">Submit</button>
+    </form>
+</div>
+{% endblock %}
