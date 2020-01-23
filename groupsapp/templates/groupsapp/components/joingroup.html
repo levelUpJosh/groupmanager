@@ -1,22 +1,30 @@
 {% extends 'base.html'%}
 {% block content %}
-<div class="card scoutpurple">
+<div class="card scoutpurple col-md-4 col-sm-12">
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}
-        {{form}}
+        <div id="code">
+            {{form.code.label_tag}}
+            {{form.code}}
+        </div>
+        <div id="member" style="display: none;">
+            {{form.member.label_tag}}
+            {{form.member}}
+        </div>
         <button type="submit" value="Submit">Submit</button>
     </form>
 </div>
 
 <script>
 var code = document.getElementById('id_code')
-var member = document.getElementById('id_member')
+var member = document.getElementById('member')
 
 code.oninput = () => {
     
     if(code.value.length <= 1){
         if(code.value.charAt(0) == 'M'){
                 console.log(code);
+                member.style.display = ''
                 var displayMember = true
         }    else{
                 member.style.display = 'none'

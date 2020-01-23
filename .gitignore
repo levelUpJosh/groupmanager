@@ -4,3 +4,4 @@ db-JoshDesktop.sqlite3
 .vscode/settings.json
 .vscode/launch.json
 *.pyc
+*.pyc
