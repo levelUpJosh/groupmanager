@@ -88,7 +88,8 @@ class JoinCodeForm(forms.Form):
     def clean(self):
         cleaned_data = super(JoinCodeForm, self).clean()
         code = cleaned_data.get('code')
-        member = cleaned_data.get('member')
+        if code[0] == "M":
+            member = cleaned_data.get('member')
         if len(code) != 8:
             raise forms.ValidationError('Code must be 8 characters long')
         if not code:

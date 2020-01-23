@@ -7,4 +7,23 @@
         <button type="submit" value="Submit">Submit</button>
     </form>
 </div>
+
+<script>
+var code = document.getElementById('id_code')
+var member = document.getElementById('id_member')
+
+code.oninput = () => {
+    
+    if(code.value.length <= 1){
+        if(code.value.charAt(0) == 'M'){
+                console.log(code);
+                var displayMember = true
+        }    else{
+                member.style.display = 'none'
+                var displayMember = false
+        }
+        console.log(displayMember)        
+    }
+}
+</script>
 {% endblock %}
