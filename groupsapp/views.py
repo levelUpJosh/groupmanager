@@ -21,7 +21,7 @@ def index(request):
 
 
 def profile(request):
-    
+    pass
 def register(request):
     
     if request.method == 'POST':
