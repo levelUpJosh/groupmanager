@@ -19,19 +19,29 @@
 var code = document.getElementById('id_code')
 var member = document.getElementById('member')
 
-code.oninput = () => {
-    
-    if(code.value.length <= 1){
-        if(code.value.charAt(0) == 'M'){
-                console.log(code);
-                member.style.display = ''
-                var displayMember = true
-        }    else{
-                member.style.display = 'none'
-                var displayMember = false
-        }
-        console.log(displayMember)        
+/* Checks if field is already prefilled */
+if(code.value.charAt(0) == 'M'){
+            console.log(code);
+            member.style.display = ''
+            var displayMember = true
+    }    else{
+            member.style.display = 'none'
+            var displayMember = false
     }
+
+code.oninput = () => {
+    /* Checks which code type has been entered when input changes */
+    /* This is defined by the first letter of the JoinCode. 'M' means 'member' and will link Member to Group where 'L' means 'Leader' and will link User to Group. */
+    if(code.value.charAt(0) == 'M'){
+            console.log(code);
+            member.style.display = ''
+            var displayMember = true
+    }    else{
+            member.style.display = 'none'
+            var displayMember = false
+    }
+    console.log(displayMember)        
 }
+
 </script>
 {% endblock %}
