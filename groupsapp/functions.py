@@ -32,8 +32,9 @@ def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
 	generated = False
 	while generated == False:
+		code = ''
 		for i in range(7):
-			code = '' + join(random.choice(letters) for i in range(7))
+			code += random.choice(letters)
 		if role == 'member':
 			code = 'M'+code
 		else:
