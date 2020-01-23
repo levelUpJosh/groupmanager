@@ -21,7 +21,7 @@ def CheckJoinCodeExists(code):
 	except:
 		return False
 def CheckJoinCodeNotUsed(member,group):
-	#Checks that the JoinCode has not already been used by the same member
+	#Checks that a JoinCode has not already been used by the same member for this group
 	try:
 		appmodels.MemberGroupLink.objects.get(group=group,member=member)
 		return False
@@ -47,7 +47,7 @@ def UseJoinCode(code,member):
 	JoinObject = CheckJoinCodeExists(code)
 	if JoinObject != False:
 		group = appmodels.Group.objects.get(pk=JoinObject.group_id)
-		if CheckJoinCodeNotUsed(code,member,group) and code.role == 'member':
+		if CheckJoinCodeNotUsed(member,group) and JoinObject.role == 'member':
 			mglink = appmodels.MemberGroupLink(member=member,group=group,role=JoinObject.role).save()
 			JoinObject.maxno -= 1
 			JoinObject.save()
