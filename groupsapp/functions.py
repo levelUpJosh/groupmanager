@@ -20,10 +20,14 @@ def CheckJoinCodeExists(code):
 		return JoinObject
 	except:
 		return False
-def CheckJoinCodeNotUsed(member,group):
+def CheckJoinCodeNotUsed(member,group,objectType='Member'):
 	#Checks that a JoinCode has not already been used by the same member for this group
 	try:
-		appmodels.MemberGroupLink.objects.get(group=group,member=member)
+		if objectType == 'Member':
+			appmodels.MemberGroupLink.objects.get(group=group,member=member)
+		if objectType == 'User':
+			appmodels.UserGroupLink.objects.get(group=group,user=member)
+
 		return False
 	except:
 		return True
