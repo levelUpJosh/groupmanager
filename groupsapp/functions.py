@@ -32,10 +32,12 @@ def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
 	generated = False
 	while generated == False:
+		for i in range(7):
+			code = '' + join(random.choice(letters) for i in range(7))
 		if role == 'member':
-			code = 'M'.join(random.choice(letters) for i in range(7))
+			code = 'M'+code
 		else:
-			code = 'L'.join(random.choice(letters) for i in range(7))
+			code = 'L'+code
 		if not appmodels.JoinCode.objects.filter(code=code):
 			new = appmodels.JoinCode(code=code,group=group,role=role,maxno=maxno)
 			new.save()
