@@ -70,7 +70,7 @@ def add_group(request):
     else:
         return HttpResponse('User not logged in',status=403)
 
-def join_group(request):
+def join_group(request,error=''):
     print(request.user,flush=True)
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -84,6 +84,8 @@ def join_group(request):
                 else:
                     code = func.UseJoinCode(code,user=request.user)
                     messages.success(request,'Group joined')
+                if code != True:
+                    return render(request, 'groupsapp/components/joingroup.html', {'form': form, 'error': code})
 
         else:
             form = appforms.JoinCodeForm(request=request)

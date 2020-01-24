@@ -1,5 +1,6 @@
 import groupsapp.models as appmodels
 import string,random
+from django.forms import ValidationError
 
 def GetAllUserMembers(search,reverse=False):
 	if reverse == False:
@@ -70,17 +71,20 @@ def UseJoinCode(code,member):
 					JoinObject.delete()
 				return True
 			else:
-				return 'This code can only be associated with a member'
-		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin'] and inputObjectType == 'User':
-			uglink = appmodels.UserGroupLink(user=member,group=group,role=JoinObject.role).save()
-			JoinObject.maxno -= 1
-			JoinObject.save()
+				return 'This code can only be associated with a member object.'
+		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin']:
+			if inputObjectType == 'User':
+				uglink = appmodels.UserGroupLink(user=member,group=group,role=JoinObject.role).save()
+				JoinObject.maxno -= 1
+				JoinObject.save()
 
-			if JoinObject.maxno == 0:
-				JoinObject.delete()
-			return True
+				if JoinObject.maxno == 0:
+					JoinObject.delete()
+				return True
+			else:
+				return 'This code can only be associated with a user, but a member object was provided.'
 		else:
-			return 'Member and group are already linked'
+			return 'Member/User and Group are already linked'
 	else:
 		return 'Code does not exist'
 

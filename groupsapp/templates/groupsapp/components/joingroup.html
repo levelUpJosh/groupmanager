@@ -1,6 +1,7 @@
 {% extends 'base.html'%}
 {% block content %}
 <div class="card scoutpurple col-md-4 col-sm-12">
+    {% include 'components/formerrordiv.html' %}
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}
         <div id="code">
