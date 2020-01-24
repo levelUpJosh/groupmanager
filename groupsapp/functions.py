@@ -54,16 +54,24 @@ def UseJoinCode(code,member):
 	#Method to use JoinCode provided by the user facing form.
 	#member in this case can actually represent a member or user object, which object is used depends on the role entry in the JoinCode object
 	JoinObject = CheckJoinCodeExists(code)
+
+	
+	#inputObjectType helps to deal with the hopefully unlikely problem that a code may include the correct attributes for 'member' but member may be provided as a 'User' object (intended for Leader role codes only) and vice versa.
+	#The javascript in the joingroup.html file SHOULD prevent this being necessary but in case of finding a way to use the console to enter into the member field when it is hidden
+	inputObjectType = member.__class__.__name__
 	if JoinObject != False:
 		group = appmodels.Group.objects.get(pk=JoinObject.group_id)
 		if CheckJoinCodeNotUsed(member,group,objectType='Member') and JoinObject.role == 'member':
-			mglink = appmodels.MemberGroupLink(member=member,group=group,role=JoinObject.role).save()
-			JoinObject.maxno -= 1
-			JoinObject.save()
-			if JoinObject.maxno == 0:
-				JoinObject.delete()
-			return True
-		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin']:
+			if inputObjectType == 'Member':
+				mglink = appmodels.MemberGroupLink(member=member,group=group,role=JoinObject.role).save()
+				JoinObject.maxno -= 1
+				JoinObject.save()
+				if JoinObject.maxno == 0:
+					JoinObject.delete()
+				return True
+			else:
+				return 'This code can only be associated with a member'
+		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin'] and inputObjectType == 'User':
 			uglink = appmodels.UserGroupLink(user=member,group=group,role=JoinObject.role).save()
 			JoinObject.maxno -= 1
 			JoinObject.save()
