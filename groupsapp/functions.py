@@ -22,6 +22,7 @@ def CheckJoinCodeExists(code):
 		return False
 def CheckJoinCodeNotUsed(member,group,objectType='Member'):
 	#Checks that a JoinCode has not already been used by the same member for this group
+	#objectType determines whether the member parameter is treated as a member object or a user object, depending on the link type
 	try:
 		if objectType == 'Member':
 			appmodels.MemberGroupLink.objects.get(group=group,member=member)
@@ -48,13 +49,22 @@ def GenerateJoinCode(group,role='member',maxno=1):
 
 def UseJoinCode(code,member):
 	#Method to use JoinCode provided by the user facing form.
+	#member in this case can actually represent a member or user object, which object is used depends on the role entry in the JoinCode object
 	JoinObject = CheckJoinCodeExists(code)
 	if JoinObject != False:
 		group = appmodels.Group.objects.get(pk=JoinObject.group_id)
-		if CheckJoinCodeNotUsed(member,group) and JoinObject.role == 'member':
+		if CheckJoinCodeNotUsed(member,group,objectType='Member') and JoinObject.role == 'member':
 			mglink = appmodels.MemberGroupLink(member=member,group=group,role=JoinObject.role).save()
 			JoinObject.maxno -= 1
 			JoinObject.save()
+			if JoinObject.maxno == 0:
+				JoinObject.delete()
+			return True
+		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin']:
+			uglink = appmodels.UserGroupLink(user=member,group=group,role=JoinObject.role).save()
+			JoinObject.maxno -= 1
+			JoinObject.save()
+
 			if JoinObject.maxno == 0:
 				JoinObject.delete()
 			return True
