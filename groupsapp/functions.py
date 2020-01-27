@@ -16,6 +16,7 @@ def GetAllUserMembers(search,reverse=False):
 
 
 def CheckJoinCodeExists(code):
+	#Checks for and returns the JoinCode onject
 	try:
 		JoinObject = appmodels.JoinCode.objects.get(code=code)
 		return JoinObject

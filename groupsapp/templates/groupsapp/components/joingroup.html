@@ -4,43 +4,45 @@
     {% include 'components/formerrordiv.html' %}
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}
-        <div id="code">
-            {{form.code.label_tag}}
-            {{form.code}}
-        </div>
-        <div id="member" style="display: none;">
-            {{form.member.label_tag}}
-            {{form.member}}
-        </div>
+        {{form}}
         <button type="submit" value="Submit">Submit</button>
     </form>
 </div>
 
 <script>
 var code = document.getElementById('id_code')
-var member = document.getElementById('member')
+var member = document.getElementById('id_member')
+var labels = document.getElementsByTagName('LABEL');
+for (var i = 0; i < labels.length; i++) {
+    if (labels[i].htmlFor != '') {
+         var elem = document.getElementById(labels[i].htmlFor);
+         if (elem)
+            elem.label = labels[i];         
+    }
+}
 
 /* Checks if field is already prefilled */
-if(code.value.charAt(0) == 'M'){
-            console.log(code);
-            member.style.display = ''
-            var displayMember = true
-    }    else{
-            member.style.display = 'none'
-            var displayMember = false
-    }
+function checkInput(){
+    if(code.value.charAt(0) == 'M'){
+        console.log(code);
+        member.style.display = ''
+        member.label.style.display = ''
+        member.required = true
 
+        var displayMember = true
+    }    else{
+        member.style.display = 'none'
+        member.label.style.display = 'none'
+        member.required = false
+        var displayMember = false
+    }
+}
+
+checkInput()
 code.oninput = () => {
     /* Checks which code type has been entered when input changes */
     /* This is defined by the first letter of the JoinCode. 'M' means 'member' and will link Member to Group where 'L' means 'Leader' and will link User to Group. */
-    if(code.value.charAt(0) == 'M'){
-            console.log(code);
-            member.style.display = ''
-            var displayMember = true
-    }    else{
-            member.style.display = 'none'
-            var displayMember = false
-    }
+    checkInput()
     console.log(displayMember)        
 }
 

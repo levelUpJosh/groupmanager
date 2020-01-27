@@ -79,14 +79,13 @@ def join_group(request,error=''):
                 code= form.cleaned_data['code']
                 if code[0] == 'M':
                     member=form.cleaned_data['member']
-                    code = func.UseJoinCode(code,member=member)
+                    code = func.UseJoinCode(code,member)
                     messages.success(request,'Group joined')
                 else:
-                    code = func.UseJoinCode(code,user=request.user)
+                    code = func.UseJoinCode(code,request.user)
                     messages.success(request,'Group joined')
                 if code != True:
-                    return render(request, 'groupsapp/components/joingroup.html', {'form': form, 'error': code})
-
+                    form = appforms.JoinCodeForm(request=request,error=code)
         else:
             form = appforms.JoinCodeForm(request=request)
         return render(request, 'groupsapp/components/joingroup.html', {'form': form})

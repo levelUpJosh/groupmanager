@@ -76,6 +76,8 @@ class JoinCodeForm(forms.Form):
             self.user = kwargs.pop('request').user
             if self.user:
                 queryset = self.GetChoices()
+        if kwargs.get('error'):
+            raise forms.ValidationError(kwargs.pop('error'))
         super(JoinCodeForm, self).__init__(*args, **kwargs)
         
         self.fields['member'].queryset = queryset
@@ -96,6 +98,8 @@ class JoinCodeForm(forms.Form):
             raise forms.ValidationError('Empty code')
         if not func.ValidateName(code):
             raise forms.ValidationError('Invalid characters')
+        if error != True:
+            raise forms.ValidationError(error)
 
 """class JoinCodeForm(forms.Form):
     def __init__(self,*args,**kwargs):
