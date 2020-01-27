@@ -14,8 +14,8 @@ from django.contrib import messages
 def index(request):
     if request.user.is_authenticated:
         members = func.GetAllUserMembers(request.user)
-        return HttpResponse(members)
-        #return render(request,'groupsapp/index.html',context={request.user: 'user', members: 'members'})
+        #return HttpResponse(members)
+        return render(request,'groupsapp/index.html',context={request.user: 'user', members: 'members'})
     else:
         return redirect('/accounts/login/')
 
@@ -55,13 +55,13 @@ def add_member(request):
         return HttpResponse('User not logged in',status=403)
 
 def add_group(request):
-    if request.user.is_authenicated:
+    if request.user.is_authenticated:
         if request.method == 'POST':
             form = appforms.GroupCreationForm(request.POST)
             if form.is_valid():
                 group = form.save()
                 code = func.GenerateJoinCode(group)
-                appmodels.UserGroupLink()
+                appmodels.UserGroupLink(user=request.user,group=group,role='admin').save()
                 messages.success(request,'Group created')
                 
         else:
