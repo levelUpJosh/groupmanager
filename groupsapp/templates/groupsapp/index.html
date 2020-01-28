@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{{ members }}
 <h1> Welcome {{user.username}}</h1>
-<h2> Members: {{ members.first().first_name}}</h1>
+<h2> Members:</h1>
+{% for member in members %}
+<h2>{{ member.id }}</h2>
+{% empty %}
+<h2>NoTHING</h2>
+{% endfor %}
 
 <h1>OOOPPS.</h1>
 {% endblock %}

@@ -1,15 +1,6 @@
 {% extends 'base.html'%}
 {% block content %}
-<<<<<<< Updated upstream
 <div class="card scoutpurple col-md-4 col-sm-12">
-    {% include 'components/formerrordiv.html' %}
-=======
-<div class="card scoutpurple">
-<<<<<<< Updated upstream
-=======
-    {% include 'components/formerrordiv.html' %}
->>>>>>> Stashed changes
->>>>>>> Stashed changes
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}
         {{form}}
