@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ members }}
+{{joingroup}}
+{{test}}
 <h1> Welcome {{user.username}}</h1>
-<h2> Members:</h1>
-{% for member in members %}
-<h2>{{ member.id }}</h2>
-{% empty %}
-<h2>NoTHING</h2>
-{% endfor %}
+<div class="card">
+    <div class="card-body">
+    <h2 class="card-title"> Members:</h2>
+        {% for member in members %}
+
+        <h3 class="card-title">{{ member.first_name }}  {{member.last_name}}</h3>
+        <div class="card-body">
+            <h4>{{member.dob}}</h4>
+        </div>
+        {% empty %}
+        <h2>NoTHING</h2>
+        {% endfor %}
+    </div>
+</div>
 
 <h1>OOOPPS.</h1>
 {% endblock %}

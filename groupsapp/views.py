@@ -14,9 +14,13 @@ from django.contrib import messages
 def index(request):
     if request.user.is_authenticated:
         members = func.GetAllUserMembers(request.user)
-        print(members, flush=True)
+        #print(members)
         #return HttpResponse(members)
-        return render(request,'groupsapp/index.html',context={request.user: 'user', members: 'members'})
+        context = {
+            'user': request.user, 
+            'members': members,
+        }
+        return render(request,'groupsapp/index.html',context=context)
     else:
         return redirect('/accounts/login/')
 
