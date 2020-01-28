@@ -2,15 +2,20 @@
 {% block content %}
 {{joingroup}}
 {{test}}
-<h1> Welcome {{user.username}}</h1>
 <div class="card">
     <div class="card-body">
-    <h2 class="card-title"> Members:</h2>
+        <h1 class="card-title text-center"> Welcome <p class="text-muted">{{user.username}}</p></h1>
+    </div>
+</div>
+<div class="card col-md-6">
+    <div class="card-body">
+        <h2 class="card-title text-center"> Members</h2>
         {% for member in members %}
-
-        <h3 class="card-title">{{ member.first_name }}  {{member.last_name}}</h3>
-        <div class="card-body">
-            <h4>{{member.dob}}</h4>
+        <div class="card col-lg-6">
+            <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
+            <ul class="card-body list-group">
+                <li class="list-group-item">{{member.dob}}</li>
+            </ul>
         </div>
         {% empty %}
         <h2>NoTHING</h2>

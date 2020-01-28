@@ -1,6 +1,9 @@
 from django.forms import EmailField
 from django import forms
 
+from django.forms.widgets import SelectDateWidget
+
+import datetime
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
@@ -25,7 +28,16 @@ class UserCreationForm(UserCreationForm):
 class MemberCreationForm(forms.ModelForm):
     first_name = forms.CharField(max_length=20)
     last_name = forms.CharField(max_length=20)
-    dob = forms.DateTimeField(label="Date of birth")
+    formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
+    dob = forms.DateTimeField(label="Date of birth",input_formats=formats)
+    def __init__(self, *args, **kwargs):
+        super(MemberCreationForm, self).__init__(*args, **kwargs)
+        this_year = datetime.date.today().year
+        years = range(this_year,this_year-100,-1)
+        #need to add constraint to stop births entered in the future
+        #years.reverse()
+        self.fields["dob"].widget = SelectDateWidget(years=years)
+    
     def clean(self):
         cleaned_data = super(MemberCreationForm, self).clean()
         first_name = cleaned_data.get('first_name')
@@ -33,7 +45,7 @@ class MemberCreationForm(forms.ModelForm):
         dob = cleaned_data.get('dob')
         if not first_name and not last_name and not dob:
             raise forms.ValidationError('Empty fields')
-        if not ValidateName(first_name) or not ValidateName(last_name):
+        if not func.ValidateName(first_name) or not func.ValidateName(last_name):
             raise forms.ValidationError('Invalid characters') 
     class Meta:
         model = appmodels.Member
