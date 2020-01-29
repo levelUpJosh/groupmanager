@@ -1,6 +1,6 @@
 {% extends 'base.html'%}
 {% block content %}
-<div class="card scoutpurple col-md-4 col-sm-12">
+<div class="card scoutpurple">
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}
         {{form}}

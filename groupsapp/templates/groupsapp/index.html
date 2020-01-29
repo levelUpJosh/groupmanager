@@ -10,16 +10,19 @@
 <div class="card col-md-6">
     <div class="card-body">
         <h2 class="card-title text-center"> Members</h2>
-        {% for member in members %}
-        <div class="card col-lg-6">
-            <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
-            <ul class="card-body list-group">
-                <li class="list-group-item">{{member.dob}}</li>
-            </ul>
+        <div class="row">
+            {% for member in members %}
+            <div class="card col-lg-6">
+                <ul class="card-body list-group">
+                    <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
+                    <li class="list-group-item">{{member.dob}}</li>
+                </ul>
+            </div>
+            
+            {% empty %}
+            <h2>NoTHING</h2>
+            {% endfor %}
         </div>
-        {% empty %}
-        <h2>NoTHING</h2>
-        {% endfor %}
     </div>
 </div>
 
