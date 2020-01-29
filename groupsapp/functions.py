@@ -2,25 +2,42 @@ import groupsapp.models as appmodels
 import string,random
 from django.forms import ValidationError
 
-def GetAllUserMembers(search,reverse=False):
-	if reverse == False:
+def GetAllUserMembers(search):
+	if search.__class__.__name__ == 'User':
 		memberlist= appmodels.UserMemberLink.objects.filter(user_id=search.pk)
-		memberlist = appmodels.Member.objects.filter(pk__in=memberlist)
+		memberlist = appmodels.Member.objects.filter(pk__in=memberlist.all().values_list('member_id'))
 		return memberlist
-	else:
+	elif search.__class__.__name__ == 'Member':
 		userlist = appmodels.UserMemberLink.objects.filter(member_id=search.pk)
-		userlist = appmodels.User.objects.filter(pk__in=userlist)
+		userlist = appmodels.User.objects.filter(pk__in=userlist.all().values_list('user_id'))
 		return userlist
+	else:
+		return 'Unsupported object type. Please input a User or Member object.'
 
-def GetAllMemberGroups(search,user=False):
-	grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search.pk)
-	print(grouplist.first().group_id,flush=True)
-	grouplist = appmodels.Group.objects.filter(pk__in=grouplist)
-	if user == True:
+def GetAllMemberGroups(search):
+	#Despite the name, this function supports both members and users. The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
+	if search.__class__.__name__ == 'User':
+		#print('user')
 		search = GetAllUserMembers(search)
+		#print(search)
+		membertrack = []
 		for member in search:
-			grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search)
-	return grouplist
+			#print(member)
+			grouplist = appmodels.MemberGroupLink.objects.filter(member_id=member.id)
+			grouplist = appmodels.Group.objects.filter(pk__in=grouplist.all().values_list('group_id'))
+			membertrack += [[member,grouplist]]
+
+		#print(membertrack)
+	elif search.__class__.__name__ == 'Member':
+		#print('member')
+		grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search.pk)
+		grouplist = appmodels.Group.objects.filter(pk__in=grouplist.all().values_list('group_id'))
+		#print(grouplist.first().group_id,flush=True)
+		membertrack = [search,grouplist]
+		#Function is handled better if all data is output in the same way even if only one member is being searched
+	else:
+		return 'Unsupported object type. Please input a User or Member object'
+	return membertrack
 
 
 def CheckJoinCodeExists(code):
