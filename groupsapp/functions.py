@@ -10,9 +10,17 @@ def GetAllUserMembers(search,reverse=False):
 	else:
 		userlist = appmodels.UserMemberLink.objects.filter(member_id=search.pk)
 		userlist = appmodels.User.objects.filter(pk__in=userlist)
-		return userlists
+		return userlist
 
-
+def GetAllMemberGroups(search,user=False):
+	grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search.pk)
+	print(grouplist.first().group_id,flush=True)
+	grouplist = appmodels.Group.objects.filter(pk__in=grouplist)
+	if user == True:
+		search = GetAllUserMembers(search)
+		for member in search:
+			grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search)
+	return grouplist
 
 
 def CheckJoinCodeExists(code):
