@@ -8,7 +8,7 @@ class Member(models.Model):
     #First name, Surname and dob fields describe the member. Is_User states whether a profile is a user's profile (can only be linked to one user and one for each user object)
     first_name = models.CharField(max_length=15)
     last_name = models.CharField(max_length=15)
-    dob = models.DateTimeField('Date of Birth')
+    dob = models.DateField(name='dob',verbose_name='Date of Birth')
     is_user = models.BooleanField(default=False)
 
     def __str__(self):

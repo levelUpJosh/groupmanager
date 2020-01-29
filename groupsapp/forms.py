@@ -29,7 +29,7 @@ class MemberCreationForm(forms.ModelForm):
     first_name = forms.CharField(max_length=20)
     last_name = forms.CharField(max_length=20)
     formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
-    dob = forms.DateTimeField(label="Date of birth",input_formats=formats)
+    dob = forms.DateField(label="Date of birth",input_formats=formats)
     def __init__(self, *args, **kwargs):
         super(MemberCreationForm, self).__init__(*args, **kwargs)
         this_year = datetime.date.today().year
@@ -58,7 +58,7 @@ class MemberCreationForm(forms.ModelForm):
             return member
 
 class GroupCreationForm(forms.ModelForm):
-    group_name = forms.CharField(max_length=20)
+    group_name = forms.CharField(max_length=15)
     group_type = forms.ChoiceField(choices=appmodels.Group.GROUP_CHOICES)
     def clean(self):
         cleaned_data = super(GroupCreationForm, self).clean()

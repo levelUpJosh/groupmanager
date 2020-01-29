@@ -115,7 +115,7 @@ def UseJoinCode(code,member):
 		return 'Code does not exist'
 
 def ValidateName(name,digits=False):
-	letters = string.ascii_letters
+	letters = string.ascii_letters+" "
 	if digits == True:
 		letters += string.digits
 	if any((c not in letters) for c in name):
