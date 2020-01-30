@@ -26,8 +26,8 @@ class UserCreationForm(UserCreationForm):
             return user
 
 class MemberCreationForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=20)
-    last_name = forms.CharField(max_length=20)
+    first_name = forms.CharField(max_length=20,required=True)
+    last_name = forms.CharField(max_length=20,required=True)
     formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
     dob = forms.DateField(label="Date of birth",input_formats=formats)
     def __init__(self, *args, **kwargs):
@@ -47,6 +47,8 @@ class MemberCreationForm(forms.ModelForm):
             raise forms.ValidationError('Empty fields')
         if not func.ValidateName(first_name) or not func.ValidateName(last_name):
             raise forms.ValidationError('Invalid characters') 
+        if dob > datetime.date.today():
+            raise forms.ValidationError({'dob': ["Birthday cannot be in the future",]})
     class Meta:
         model = appmodels.Member
         fields = ["first_name","last_name","dob"]

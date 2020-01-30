@@ -43,6 +43,13 @@
           </form>
         </div>
       </nav>
+    {% if messages %}
+    <ul class="messages alert alert-primary">
+      {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
     {% endblock %}
     {% block content %}
     {% endblock %}
