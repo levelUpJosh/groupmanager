@@ -39,7 +39,24 @@ def GetAllMemberGroups(search):
 		return 'Unsupported object type. Please input a User or Member object'
 	return membertrack
 
-
+def GetAllUserGroups(search):
+	returnlist = []
+	if search.__class__.__name__ == 'User':
+		grouplist= appmodels.UserGroupLink.objects.filter(user_id=search.pk)
+		for link in grouplist:
+			role = link.role
+			group = appmodels.Group.objects.get(pk=link.group_id)
+			returnlist += [[group,role]]
+		return returnlist
+	elif search.__class__.__name__ == 'Group':
+		userlist = appmodels.UserGroupLink.objects.filter(group_id=search.pk)
+		for link in userlist:
+			role = link.role
+			user = appmodels.User.objects.get(pk=link.user_id)
+			returnlist += [[user,role]]
+		return returnlist
+	else:
+		return 'Unsupported object type. Please input a User or Member object.'
 def CheckJoinCodeExists(code):
 	#Checks for and returns the JoinCode onject
 	try:
