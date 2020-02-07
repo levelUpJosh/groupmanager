@@ -112,8 +112,8 @@ class JoinCodeForm(forms.Form):
             raise forms.ValidationError('Empty code')
         if not func.ValidateName(code):
             raise forms.ValidationError('Invalid characters')
-        if error != True:
-            raise forms.ValidationError(error)
+        #if error != True:
+            #raise forms.ValidationError(error)
 
 """class JoinCodeForm(forms.Form):
     def __init__(self,*args,**kwargs):
