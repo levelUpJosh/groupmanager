@@ -32,8 +32,10 @@
                 {% for group in groups %}
                 <div class="card col-lg-6">
                     <ul class="card-body list-group">
-                        <h5 class="card-title">{{ group }} </h5>
-                        <li class="list-group-item"></li>
+                        <h5 class="card-title">{{ group.0 }} </h5>
+                        {% for member in group.1%}
+                        <li class="list-group-item">{{member}}</li>
+                        {% endfor %}
                     </ul>
                 </div>
                 {% empty %}

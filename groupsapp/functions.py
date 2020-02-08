@@ -14,20 +14,56 @@ def GetAllUserMembers(search):
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
 
-def GetAllMemberGroups(search):
+def GetAllMemberGroups(search,by_group=False):
+	from  itertools import chain 
 	#Despite the name, this function supports both members and users. The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
 	if search.__class__.__name__ == 'User':
 		#print('user')
+		#First get a QuerySet of all the Members attached to the User
 		search = GetAllUserMembers(search)
 		#print(search)
+		#Set up empty lists
 		membertrack = []
+		grouptrack = []
+
+		#iterate through the search to get all groups for all members and make a list
 		for member in search:
 			#print(member)
 			grouplist = appmodels.MemberGroupLink.objects.filter(member_id=member.id)
 			grouplist = appmodels.Group.objects.filter(pk__in=grouplist.all().values_list('group_id'))
 			membertrack += [[member,grouplist]]
+		if by_group == True:
+			#If request, we want to sort the current list so that Members are grouped by their Group, rather than the other way around 
+			for item in membertrack:
+				#iterate through the previous list made
+				#print(item[1].all())
+				if not item[1]:
+					#Retrospectively add in a 'No Group' entry for items with empty grouplist QuerySet objects
+					item[1] = ['No Group']
+				for group in item[1]:
+					#Iterate through each group in a member's list
+					if group in chain(*grouptrack):
+						#check if the group is already entered
+						for i in range(0,len(grouptrack)):
+							#find where the Group is entered
+							try:
+								grouptrack[i].index(group)
+								location = i
+							except:
+								pass
+						#append the member to the correct location
+						grouptrack[location][1].append(member)
+						
+					else:
+						#add the group to the list if it's not been entered previously
+						grouptrack += [[group,[member]]]
+						#print(group)
+						
+				#print(grouptrack)
 
-		#print(membertrack)
+			print(grouptrack)
+			return grouptrack
+			#print(membertrack)
 	elif search.__class__.__name__ == 'Member':
 		#print('member')
 		grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search.pk)

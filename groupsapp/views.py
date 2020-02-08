@@ -14,7 +14,7 @@ from django.contrib import messages
 def index(request):
     if request.user.is_authenticated:
         members = func.GetAllUserMembers(request.user)
-        groups = func.GetAllMemberGroups(request.user)
+        groups = func.GetAllMemberGroups(request.user,by_group=True)
         #print(members)
         #return HttpResponse(members)
         context = {
