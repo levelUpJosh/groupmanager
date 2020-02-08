@@ -5,11 +5,17 @@ from django.contrib.auth.models import User
 # Create your models here.
 # Profile Models
 class Member(models.Model):
-    #First name, Surname and dob fields describe the member. Is_User states whether a profile is a user's profile (can only be linked to one user and one for each user object)
+    #First name, Surname and dob fields describe the member.
     first_name = models.CharField(max_length=15)
     last_name = models.CharField(max_length=15)
+    GENDER_CHOICES = [
+    ('M', 'Male'),
+    ('F', 'Female'),
+    ('O', 'Other'),
+    ('U','Unknown: Not Set')
+    ]
+    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='U')
     dob = models.DateTimeField('Date of Birth')
-    is_user = models.BooleanField(default=False)
 
     def __str__(self):
         return self.first_name +" "+ self.last_name
