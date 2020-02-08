@@ -1,6 +1,9 @@
 from django.forms import EmailField
 from django import forms
 
+from django.forms.widgets import SelectDateWidget
+
+import datetime
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
@@ -23,9 +26,18 @@ class UserCreationForm(UserCreationForm):
             return user
 
 class MemberCreationForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=20)
-    last_name = forms.CharField(max_length=20)
-    dob = forms.DateTimeField(label="Date of birth")
+    first_name = forms.CharField(max_length=20,required=True)
+    last_name = forms.CharField(max_length=20,required=True)
+    formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
+    dob = forms.DateField(label="Date of birth",input_formats=formats)
+    def __init__(self, *args, **kwargs):
+        super(MemberCreationForm, self).__init__(*args, **kwargs)
+        this_year = datetime.date.today().year
+        years = range(this_year,this_year-100,-1)
+        #need to add constraint to stop births entered in the future
+        #years.reverse()
+        self.fields["dob"].widget = SelectDateWidget(years=years)
+    
     def clean(self):
         cleaned_data = super(MemberCreationForm, self).clean()
         first_name = cleaned_data.get('first_name')
@@ -33,8 +45,10 @@ class MemberCreationForm(forms.ModelForm):
         dob = cleaned_data.get('dob')
         if not first_name and not last_name and not dob:
             raise forms.ValidationError('Empty fields')
-        if not ValidateName(first_name) or not ValidateName(last_name):
+        if not func.ValidateName(first_name) or not func.ValidateName(last_name):
             raise forms.ValidationError('Invalid characters') 
+        if dob > datetime.date.today():
+            raise forms.ValidationError({'dob': ["Birthday cannot be in the future",]})
     class Meta:
         model = appmodels.Member
         fields = ["first_name","last_name","dob"]
@@ -46,7 +60,7 @@ class MemberCreationForm(forms.ModelForm):
             return member
 
 class GroupCreationForm(forms.ModelForm):
-    group_name = forms.CharField(max_length=20)
+    group_name = forms.CharField(max_length=15)
     group_type = forms.ChoiceField(choices=appmodels.Group.GROUP_CHOICES)
     def clean(self):
         cleaned_data = super(GroupCreationForm, self).clean()
@@ -76,6 +90,8 @@ class JoinCodeForm(forms.Form):
             self.user = kwargs.pop('request').user
             if self.user:
                 queryset = self.GetChoices()
+        if kwargs.get('error'):
+            raise forms.ValidationError(kwargs.pop('error'))
         super(JoinCodeForm, self).__init__(*args, **kwargs)
         
         self.fields['member'].queryset = queryset
@@ -88,13 +104,16 @@ class JoinCodeForm(forms.Form):
     def clean(self):
         cleaned_data = super(JoinCodeForm, self).clean()
         code = cleaned_data.get('code')
-        member = cleaned_data.get('member')
+        if code[0] == "M":
+            member = cleaned_data.get('member')
         if len(code) != 8:
             raise forms.ValidationError('Code must be 8 characters long')
         if not code:
             raise forms.ValidationError('Empty code')
         if not func.ValidateName(code):
             raise forms.ValidationError('Invalid characters')
+        #if error != True:
+            #raise forms.ValidationError(error)
 
 """class JoinCodeForm(forms.Form):
     def __init__(self,*args,**kwargs):

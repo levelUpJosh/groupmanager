@@ -7,4 +7,43 @@
         <button type="submit" value="Submit">Submit</button>
     </form>
 </div>
+
+<script>
+var code = document.getElementById('id_code')
+var member = document.getElementById('id_member')
+var labels = document.getElementsByTagName('LABEL');
+for (var i = 0; i < labels.length; i++) {
+    if (labels[i].htmlFor != '') {
+         var elem = document.getElementById(labels[i].htmlFor);
+         if (elem)
+            elem.label = labels[i];         
+    }
+}
+
+/* Checks if field is already prefilled */
+function checkInput(){
+    if(code.value.charAt(0) == 'M'){
+        console.log(code);
+        member.style.display = ''
+        member.label.style.display = ''
+        member.required = true
+
+        var displayMember = true
+    }    else{
+        member.style.display = 'none'
+        member.label.style.display = 'none'
+        member.required = false
+        var displayMember = false
+    }
+}
+
+checkInput()
+code.oninput = () => {
+    /* Checks which code type has been entered when input changes */
+    /* This is defined by the first letter of the JoinCode. 'M' means 'member' and will link Member to Group where 'L' means 'Leader' and will link User to Group. */
+    checkInput()
+    console.log(displayMember)        
+}
+
+</script>
 {% endblock %}

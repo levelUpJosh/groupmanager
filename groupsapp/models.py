@@ -8,6 +8,7 @@ class Member(models.Model):
     #First name, Surname and dob fields describe the member.
     first_name = models.CharField(max_length=15)
     last_name = models.CharField(max_length=15)
+    dob = models.DateField(name='dob',verbose_name='Date of Birth')
     GENDER_CHOICES = [
     ('M', 'Male'),
     ('F', 'Female'),
@@ -15,7 +16,7 @@ class Member(models.Model):
     ('U','Unknown: Not Set')
     ]
     gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='U')
-    dob = models.DateTimeField('Date of Birth')
+
 
     def __str__(self):
         return self.first_name +" "+ self.last_name
@@ -35,6 +36,11 @@ class Group(models.Model):
 class UserMemberLink(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     member = models.ForeignKey(Member,on_delete=models.CASCADE)
+
+class UserGroupLink(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    group = models.ForeignKey(Group,on_delete=models.CASCADE)
+    role = models.CharField(max_length=20)
 
 class MemberGroupLink(models.Model):
     member = models.ForeignKey(Member,on_delete=models.CASCADE)

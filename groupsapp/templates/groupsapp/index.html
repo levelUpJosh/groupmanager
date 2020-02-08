@@ -1,8 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h1> Welcome {{user.username}}</h1>
-<h2> Members: {{ members.first().first_name }}</h1>
-
+{{joingroup}}
+{{test}}
+<div class="card row">
+    <div class="card-body">
+        <h1 class="card-title text-center"> Welcome <p class="text-muted">{{user.username}}</p></h1>
+    </div>
+</div>
+<div class="row">
+    <div class="card col-md-6">
+        <div class="card-body">
+            <h2 class="card-title text-center"> Members</h2>
+            <div class="row">
+                {% for member in members %}
+                <div class="card col-lg-6">
+                    <ul class="card-body list-group">
+                        <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
+                        <li class="list-group-item">Date of birth: {{member.dob}}</li>
+                    </ul>
+                </div>
+                {% empty %}
+                <h2>NoTHING</h2>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card col-md-6">
+        <div class="card-body">
+            <h2 class="card-title text-center">Groups:</h2>
+            <div class="row">
+                {% for group in groups %}
+                <div class="card col-lg-6">
+                    <ul class="card-body list-group">
+                        <h5 class="card-title">{{ group.0 }} </h5>
+                        {% for member in group.1%}
+                        <li class="list-group-item">{{member}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% empty %}
+                <h2>NoTHING</h2>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 <h1>OOOPPS.</h1>
 {% endblock %}
