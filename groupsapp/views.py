@@ -27,7 +27,10 @@ def index(request):
         return redirect('/accounts/login/')
 
 
-def profile(request):
+def memberprofile(request,id):
+    pass
+
+def groupprofile(request,id):
     pass
 def register(request):
     

@@ -7,6 +7,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('addmember/', views.add_member, name="addmember"),
     path('addgroup/', views.add_group, name="addgroup"),
-    path('joingroup/', views.join_group, name="joingroup")
+    path('joingroup/', views.join_group, name="joingroup"),
+    path('profile/<int:id>', views.memberprofile, name="profile"),
+    path('group/<int:id>', views.groupprofile, name="group"),
 
 ]

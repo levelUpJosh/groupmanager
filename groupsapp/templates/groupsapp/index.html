@@ -15,7 +15,7 @@
                 {% for member in members %}
                 <div class="card col-lg-6">
                     <ul class="card-body list-group">
-                        <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
+                        <h5 class="card-title"><a href="{% url 'profile' member.id %}">{{ member.first_name }}  {{member.last_name}}</a></h5>
                         <li class="list-group-item">Date of birth: {{member.dob}}</li>
                     </ul>
                 </div>
@@ -32,7 +32,11 @@
                 {% for group in groups %}
                 <div class="card col-lg-6">
                     <ul class="card-body list-group">
-                        <h5 class="card-title">{{ group.0 }} </h5>
+                        {% if group.0 != 'No Group' %}
+                        <h5 class="card-title"><a href="{% url 'group' group.0.id %}">{{ group.0 }}</a></h5>
+                        {%else%}
+                        <h6 class="card-title">{{ group.0 }}</h6>
+                        {%endif%}
                         {% for member in group.1%}
                         <li class="list-group-item">{{member}}</li>
                         {% endfor %}
