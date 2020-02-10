@@ -20,7 +20,9 @@
                     </ul>
                 </div>
                 {% empty %}
-                <h2>NoTHING</h2>
+                <div class="card col-12">
+                    <h5 class="card-title text-center mt-2"><a href="{% url 'addmember'%}">Please add a member to continue</a></h5>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -36,6 +38,7 @@
                         <h5 class="card-title"><a href="{% url 'group' group.0.id %}">{{ group.0 }}</a></h5>
                         {%else%}
                         <h6 class="card-title">{{ group.0 }}</h6>
+                        <a class="card-title" href="{% url 'joingroup'%}">Use a join code to join a group</a>
                         {%endif%}
                         {% for member in group.1%}
                         <li class="list-group-item">{{member}}</li>
@@ -43,11 +46,12 @@
                     </ul>
                 </div>
                 {% empty %}
-                <h2>NoTHING</h2>
+                <div class="card col-12">
+                    <h5 class="card-title text-center mt-2">You have no members and no associated groups.</h5>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
-<h1>OOOPPS.</h1>
 {% endblock %}
