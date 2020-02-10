@@ -1,6 +1,24 @@
 import groupsapp.models as appmodels
 import string,random
 from django.forms import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+
+
+def CheckUserMemberLink(user,member_id):
+	members=GetAllUserMembers(user)
+	try:
+		member = appmodels.Member.objects.get(id=member_id)
+	except ObjectDoesNotExist:
+		#If the object is not found, then return false
+		return False
+
+	if member in members:
+		#Returns true if user has access to the member's info
+		return True
+	else:
+		#If user does not have access to the member, then act as though it doesn't exist.
+		return False
+
 
 def GetAllUserMembers(search):
 	if search.__class__.__name__ == 'User':
@@ -35,6 +53,7 @@ def GetAllMemberGroups(search,by_group=False):
 		if by_group == True:
 			#If request, we want to sort the current list so that Members are grouped by their Group, rather than the other way around 
 			for item in membertrack:
+				member = item[0]
 				#iterate through the previous list made
 				#print(item[1].all())
 				if not item[1]:
@@ -54,6 +73,7 @@ def GetAllMemberGroups(search,by_group=False):
 						#append the member to the correct location
 						grouptrack[location][1].append(member)
 						
+						
 					else:
 						#add the group to the list if it's not been entered previously
 						grouptrack += [[group,[member]]]
@@ -61,7 +81,7 @@ def GetAllMemberGroups(search,by_group=False):
 						
 				#print(grouptrack)
 
-			print(grouptrack)
+			
 			return grouptrack
 			#print(membertrack)
 	elif search.__class__.__name__ == 'Member':
