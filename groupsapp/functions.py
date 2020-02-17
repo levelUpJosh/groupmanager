@@ -134,6 +134,9 @@ def CheckJoinCodeNotUsed(member,group):
 		return True
 def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
+	#An odd issue of using random sequences of the full alphabet is that there is a small chance that the code could spell out words, some of which groups may not wish to distribute to parents.
+	#This might not be too favourable so we'll remove the vowels from the letter selection,
+	letters = letters.translate({ord('A'): None, ord('E'): None, ord('I'): None, ord('O'): None, ord('U'): None})
 	generated = False
 	while generated == False:
 		code = ''
