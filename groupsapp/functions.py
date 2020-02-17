@@ -31,7 +31,6 @@ def GetAllUserMembers(search):
 		return userlist
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
-
 def GetAllMemberGroups(search,by_group=False):
 	from  itertools import chain 
 	#Despite the name, this function supports both members and users. The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
@@ -94,7 +93,6 @@ def GetAllMemberGroups(search,by_group=False):
 	else:
 		return 'Unsupported object type. Please input a User or Member object'
 	return membertrack
-
 def GetAllUserGroups(search):
 	returnlist = []
 	if search.__class__.__name__ == 'User':
@@ -113,6 +111,7 @@ def GetAllUserGroups(search):
 		return returnlist
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
+
 def CheckJoinCodeExists(code):
 	#Checks for and returns the JoinCode onject
 	try:
@@ -120,19 +119,19 @@ def CheckJoinCodeExists(code):
 		return JoinObject
 	except:
 		return False
-def CheckJoinCodeNotUsed(member,group,objectType='Member'):
+def CheckJoinCodeNotUsed(member,group):
+	inputObjectType = member.__class__.__name__
 	#Checks that a JoinCode has not already been used by the same member for this group
 	#objectType determines whether the member parameter is treated as a member object or a user object, depending on the link type
 	try:
-		if objectType == 'Member':
+		if inputObjectType == 'Member':
 			appmodels.MemberGroupLink.objects.get(group=group,member=member)
-		if objectType == 'User':
+		if inputOobjectType == 'User':
 			appmodels.UserGroupLink.objects.get(group=group,user=member)
 
 		return False
 	except:
 		return True
-
 def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
 	generated = False
@@ -149,7 +148,6 @@ def GenerateJoinCode(group,role='member',maxno=1):
 			new.save()
 			generated = True
 			return new
-
 def UseJoinCode(code,member):
 	#Method to use JoinCode provided by the user facing form.
 	#member in this case can actually represent a member or user object, which object is used depends on the role entry in the JoinCode object
@@ -160,8 +158,9 @@ def UseJoinCode(code,member):
 	#The javascript in the joingroup.html file SHOULD prevent this being necessary but in case of finding a way to use the console to enter into the member field when it is hidden
 	inputObjectType = member.__class__.__name__
 	if JoinObject != False:
-		group = appmodels.Group.objects.get(pk=JoinObject.group_id)
-		if CheckJoinCodeNotUsed(member,group,objectType='Member') and JoinObject.role == 'member':
+		is_not_used = CheckJoinCodeNotUsed(member,group)
+		group = appmodels.Group.objects.get(pk=JoinObject.group_id) # What if the group no longer exists. I suppose a delete group function would also scrap the joincodes
+		if is_not_used == True and JoinObject.role == 'member':
 			if inputObjectType == 'Member':
 				mglink = appmodels.MemberGroupLink(member=member,group=group,role=JoinObject.role).save()
 				JoinObject.maxno -= 1
@@ -171,7 +170,7 @@ def UseJoinCode(code,member):
 				return True
 			else:
 				return 'This code can only be associated with a member object.'
-		elif CheckJoinCodeNotUsed(member,group,objectType='User') and JoinObject.role in ['leader','admin']:
+		elif is_not_used == True and JoinObject.role in ['leader','admin']:
 			if inputObjectType == 'User':
 				uglink = appmodels.UserGroupLink(user=member,group=group,role=JoinObject.role).save()
 				JoinObject.maxno -= 1
