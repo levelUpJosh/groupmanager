@@ -27,16 +27,7 @@ def index(request):
         return redirect('/accounts/login/')
 
 
-def memberprofile(request,member_id):
-    if request.user.is_authenticated:
-        if func.CheckUserMemberLink(request.user,member_id):
-            return HttpResponse("OK")
-        else:
-            return HttpResponse("NO exist")
-    else:
-        return redirect('/accounts/login')
-
-def groupprofile(request,id):
+def profile(request):
     pass
 def register(request):
     

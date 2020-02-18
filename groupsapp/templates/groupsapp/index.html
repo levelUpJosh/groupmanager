@@ -15,14 +15,12 @@
                 {% for member in members %}
                 <div class="card col-lg-6">
                     <ul class="card-body list-group">
-                        <h5 class="card-title"><a href="{% url 'member' member.id %}">{{ member.first_name }}  {{member.last_name}}</a></h5>
+                        <h5 class="card-title">{{ member.first_name }}  {{member.last_name}}</h5>
                         <li class="list-group-item">Date of birth: {{member.dob}}</li>
                     </ul>
                 </div>
                 {% empty %}
-                <div class="card col-12">
-                    <h5 class="card-title text-center mt-2"><a href="{% url 'addmember'%}">Please add a member to continue</a></h5>
-                </div>
+                <h2>NoTHING</h2>
                 {% endfor %}
             </div>
         </div>
@@ -34,24 +32,18 @@
                 {% for group in groups %}
                 <div class="card col-lg-6">
                     <ul class="card-body list-group">
-                        {% if group.0 != 'No Group' %}
-                        <h5 class="card-title"><a href="{% url 'group' group.0.id %}">{{ group.0 }}</a></h5>
-                        {%else%}
-                        <h6 class="card-title">{{ group.0 }}</h6>
-                        <a class="card-title" href="{% url 'joingroup'%}">Use a join code to join a group</a>
-                        {%endif%}
+                        <h5 class="card-title">{{ group.0 }} </h5>
                         {% for member in group.1%}
                         <li class="list-group-item">{{member}}</li>
                         {% endfor %}
                     </ul>
                 </div>
                 {% empty %}
-                <div class="card col-12">
-                    <h5 class="card-title text-center mt-2">You have no members and no associated groups.</h5>
-                </div>
+                <h2>NoTHING</h2>
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
+<h1>OOOPPS.</h1>
 {% endblock %}

@@ -11,9 +11,6 @@ import groupsapp.models as appmodels
 import groupsapp.functions as func
 from django.contrib.auth.forms import UserCreationForm
 
-
-
-
 class UserCreationForm(UserCreationForm):
     email = EmailField(label=_("Email address"),required=True,help_text=_("Required field"))
 
