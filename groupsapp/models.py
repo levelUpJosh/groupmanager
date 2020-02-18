@@ -1,28 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
+import encrypted_model_fields.fields as e_models
 
 
 # Create your models here.
 # Profile Models
 class Member(models.Model):
     #First name, Surname and dob fields describe the member.
-    first_name = models.CharField(max_length=15)
-    last_name = models.CharField(max_length=15)
-    dob = models.DateField(name='dob',verbose_name='Date of Birth')
+    first_name = e_models.EncryptedCharField(max_length=15)
+    last_name = e_models.EncryptedCharField(max_length=15)
+    dob = e_models.EncryptedDateField(name='dob',verbose_name='Date of Birth')
     GENDER_CHOICES = [
     ('M', 'Male'),
     ('F', 'Female'),
     ('O', 'Other'),
     ('U','Unknown: Not Set')
     ]
-    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='U')
+    gender = e_models.EncryptedCharField(max_length=1,choices=GENDER_CHOICES,default='U')
 
 
     def __str__(self):
         return self.first_name +" "+ self.last_name
 
 class Group(models.Model):
-    group_name = models.CharField(max_length=15,unique=False)
+    group_name = e_models.EncryptedCharField(max_length=15,unique=False)
     GROUP_CHOICES = [
     ('SE', 'Section'),
     ('GR', 'Group'),

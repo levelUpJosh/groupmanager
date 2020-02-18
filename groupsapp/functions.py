@@ -31,6 +31,15 @@ def GetAllUserMembers(search):
 		return userlist
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
+
+def GetAllUserGroups(search):
+	if search.__class__.__name__ == 'User':
+		grouplist= appmodels.UserGroupLink.objects.filter(user_id=search.pk)
+		grouplist = appmodels.Group.objects.filter(pk__in=memberlist.all().values_list('group_id'))
+		return grouplist
+	else:
+		return 'Unsupported object type. Please input a User object.'
+
 def GetAllMemberGroups(search,by_group=False):
 	from  itertools import chain 
 	#Despite the name, this function supports both members and users. The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
