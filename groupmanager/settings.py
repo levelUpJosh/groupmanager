@@ -39,10 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'encrypted_model_fields',
 ]
-
-FIELD_ENCRYPTION_KEY = 'fsW_tU2uBXa4ymznfPdUCevNtDO5AH-t2TdvoSBSImY='
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
