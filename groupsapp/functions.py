@@ -32,13 +32,16 @@ def GetAllUserMembers(search):
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
 
-def GetAllUserGroups(search):
+""" def GetAllUserGroups(search):
 	if search.__class__.__name__ == 'User':
 		grouplist= appmodels.UserGroupLink.objects.filter(user_id=search.pk)
 		grouplist = appmodels.Group.objects.filter(pk__in=memberlist.all().values_list('group_id'))
 		return grouplist
+	elif search.__class__.__name__=='Group':
+		userlist = appmodels.UserGroupLink.objects.filter(group_id=search.pk)
+		userlist = appmodels.User.objects.filter(pk__in=memberlist.all().values_list('group_id'))
 	else:
-		return 'Unsupported object type. Please input a User object.'
+		return 'Unsupported object type. Please input a User object.' """
 
 def GetAllMemberGroups(search,by_group=False):
 	from  itertools import chain 
@@ -170,7 +173,7 @@ def UseJoinCode(code,member):
 	#The javascript in the joingroup.html file SHOULD prevent this being necessary but in case of finding a way to use the console to enter into the member field when it is hidden
 	inputObjectType = member.__class__.__name__
 	if JoinObject != False:
-		is_not_used = CheckJoinCodeNotUsed(member,group)
+		is_not_used = CheckJoinCodeNotUsed(member,JoinObject.group)
 		group = appmodels.Group.objects.get(pk=JoinObject.group_id) # What if the group no longer exists. I suppose a delete group function would also scrap the joincodes
 		if is_not_used == True and JoinObject.role == 'member':
 			if inputObjectType == 'Member':
