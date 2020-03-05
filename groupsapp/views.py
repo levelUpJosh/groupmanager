@@ -34,7 +34,7 @@ def memberprofile(request,member_id):
         if func.CheckUserMemberLink(request.user,member_id):
             return HttpResponse("OK")
         else:
-            return HttpResponse("NO exist")
+            return HttpResponse("No exist")
     else:
         return redirect('/accounts/login')
 
