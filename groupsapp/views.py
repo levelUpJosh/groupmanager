@@ -10,6 +10,10 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 
+def logout(request):
+    logout(request)
+    # Redirect
+    return redirect('index')
 
 def index(request):
     if request.user.is_authenticated:
@@ -26,7 +30,7 @@ def index(request):
         }
         return render(request,'groupsapp/index.html',context=context)
     else:
-        return redirect('/accounts/login/')
+        return redirect('login')
 
 
 def memberprofile(request,member_id):
@@ -36,7 +40,7 @@ def memberprofile(request,member_id):
         else:
             return HttpResponse("No exist")
     else:
-        return redirect('/accounts/login')
+        return redirect('login')
 
 def groupprofile(request,id):
     pass
