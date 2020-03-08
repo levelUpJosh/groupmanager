@@ -1,9 +1,9 @@
 {% extends 'base.html'%}
 {% block content %}
 <div class="card scoutpurple">
-    <form action="{% url 'register'%}" method="post" class="card-body">
+    <form action="{% url 'login'%}" method="post" class="card-body">
         {% csrf_token %}
-        <h1 class="card-title">Sign Up to Group Manager</h1>
+        <h1 class="card-title">Log in to Group Manager</h1>
         <table>
             {{form.as_table}}
         </table>

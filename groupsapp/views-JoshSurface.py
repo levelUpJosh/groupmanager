@@ -5,32 +5,15 @@ from django.http import HttpResponse
 import groupsapp.forms as appforms
 import groupsapp.models as appmodels
 import groupsapp.functions as func
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as loginfunc
+from django.contrib.auth import login,authenticate
 from django.contrib.auth.models import User
 from django.contrib import messages
 
-def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    return context
 
-def login(request):
-    if request.method == 'POST':
-        form = appforms.UserLoginForm(request.POST)
-        if form.is_valid():
-            #form.save()
-            messages.success(request,'account Logged in')
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username,password=password)
-            if user is not None:
-            #request.login(user)
-                loginfunc(request,user)
-                print("PPPP")
-            return redirect('index')
-    else:
-        form =  appforms.UserLoginForm()
-    return render(request, 'groupsapp/login.html', {'form': form})
+def logout(request):
+    logout(request)
+    # Redirect
+    return redirect('index')
 
 def index(request):
     if request.user.is_authenticated:
@@ -40,6 +23,7 @@ def index(request):
         #print(members)
         #return HttpResponse(members)
         context = {
+            'user': request.user, 
             'members': members,
             'groups': groups,
             'usergroups': usergroups,
@@ -52,14 +36,9 @@ def index(request):
 def memberprofile(request,member_id):
     if request.user.is_authenticated:
         if func.CheckUserMemberLink(request.user,member_id):
-            member = appmodels.Member.objects.get(id=member_id)
-            context = {
-                'member': member,
-                'groups': func.GetAllMemberGroups(member),
-            }
-            return render(request,'groupsapp/objects/member/profile.html',context=context)
+            return HttpResponse("OK")
         else:
-            return HttpResponse("NO exist")
+            return HttpResponse("No exist")
     else:
         return redirect('login')
 
@@ -76,7 +55,6 @@ def register(request):
             password = form.cleaned_data['password1']
             user = authenticate(username=username,password=password)
             #login(request,user)
-            login(request,user)
             return redirect('profile')
     else:
         form =  appforms.UserCreationForm()

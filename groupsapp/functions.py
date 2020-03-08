@@ -122,7 +122,7 @@ def GetAllUserGroups(search):
 			returnlist += [[user,role]]
 		return returnlist
 	else:
-		return 'Unsupported object type. Please input a User or Member object.'
+		return 'Unsupported object type. Please input a User or Group object.'
 
 def CheckJoinCodeExists(code):
 	#Checks for and returns the JoinCode onject

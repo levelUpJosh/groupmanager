@@ -18,8 +18,7 @@ from django.urls import path, include
 from groupsapp import views as appviews
 
 urlpatterns = [
-    path('accounts/',include('django.contrib.auth.urls')),
-    path('accounts/register/',appviews.register),
+    #path('accounts/',include('django.contrib.auth.urls')),
     path('app/',include('groupsapp.urls')),
     path('admin/', admin.site.urls),
 ]

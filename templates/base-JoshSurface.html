@@ -5,7 +5,7 @@
 
 </head>
 <body>
-  <div class="container">
+    <div class="container">
     <h1 class="display-4 text-center">Group Manager</h1>
     {% block nav %}
       <nav class="navbar navbar-expand-lg navbar-light bg-light mb-1">
@@ -28,11 +28,11 @@
               <a class="nav-link" href="#">Groups</a>
             </li>
           </ul>
-          {% if user.is_authenticated%}
-          <form class="form-inline my-2 my-lg-0" action="{% url 'logout'%}" method="post">
+          {% if user.is_authenticated %}
+          <form class="form-inline my-2 my-lg-0" action="{% url 'logout'%}">
             <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Log Out</button>
           </form>
-          {% endif%}
+          {% endif %}
         </div>
       </nav>
     {% if messages %}
@@ -40,12 +40,12 @@
       {% for message in messages %}
       <li class="{{ message.tags }}">{{ message }}</li>
     {% endfor %}
-    </ul>
-    {% endif %}
+  </ul>
+  {% endif %}
     {% endblock %}
     {% block content %}
     {% endblock %}
-  </div>
+    </div>
 </body>
 <script
   src="https://code.jquery.com/jquery-3.4.1.slim.min.js"

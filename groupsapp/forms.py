@@ -14,8 +14,11 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 
-class UserCreationForm(UserCreationForm):
-    email = EmailField(label=_("Email address"),required=True,help_text=_("Required field"))
+class UserCreationForm(forms.ModelForm):
+    username = forms.CharField()
+    password1= forms.CharField(label="Password",widget=forms.PasswordInput())
+    password2 =forms.CharField(label="Confirm Password",widget=forms.PasswordInput())
+    email = forms.EmailField(label=_("Email address"),required=True)
 
     class Meta:
         model = appmodels.User
@@ -24,9 +27,20 @@ class UserCreationForm(UserCreationForm):
         def save(self, commit=True):
             user = super(UserCreationForm,self).save(commit=False)
             user.email = self.cleaned_data["email"]
+            if not func.ValidateName(username):
+                raise forms.ValidationError({'username': ["Name has invalid characters",]})
             if commit:
                 user.save()
             return user
+
+class UserLoginForm(forms.Form):
+    username = forms.CharField()
+    password= forms.CharField(label="Password",widget=forms.PasswordInput())
+
+    class Meta:
+        model = appmodels.User
+        fields = ["username","password"]
+
 
 class MemberCreationForm(forms.ModelForm):
     first_name = forms.CharField(max_length=20,required=True)
