@@ -31,6 +31,10 @@ def login(request):
     else:
         form =  appforms.UserLoginForm()
     return render(request, 'groupsapp/login.html', {'form': form})
+def logout(request):
+    logout(request)
+    # Redirect
+    return redirect('index')
 
 def index(request):
     if request.user.is_authenticated:
@@ -59,7 +63,7 @@ def memberprofile(request,member_id):
             }
             return render(request,'groupsapp/objects/member/profile.html',context=context)
         else:
-            return HttpResponse("NO exist")
+            return HttpResponse("No exist")
     else:
         return redirect('login')
 
