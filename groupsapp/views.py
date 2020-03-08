@@ -5,7 +5,7 @@ from django.http import HttpResponse
 import groupsapp.forms as appforms
 import groupsapp.models as appmodels
 import groupsapp.functions as func
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as loginfunc
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -19,22 +19,27 @@ def login(request):
         form = appforms.UserLoginForm(request.POST)
         if form.is_valid():
             #form.save()
-            messages.success(request,'account Logged in')
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(username=username,password=password)
+            print(user,username,password)
             if user is not None:
+                messages.success(request,'Account Logged in')
             #request.login(user)
                 loginfunc(request,user)
                 print("PPPP")
+            else:
+                messages.error(request,'Username or password is incorrect')
             return redirect('index')
     else:
         form =  appforms.UserLoginForm()
     return render(request, 'groupsapp/login.html', {'form': form})
-def logout(request):
-    logout(request)
-    # Redirect
-    return redirect('index')
+
+def logoutpage(request):
+    if request.method ==  'POST':
+        logout(request)
+        # Redirect
+        return redirect('index')
 
 def index(request):
     if request.user.is_authenticated:
