@@ -85,8 +85,8 @@ def register(request):
             password = form.cleaned_data['password1']
             user = authenticate(username=username,password=password)
             #login(request,user)
-            login(request,user)
-            return redirect('profile')
+            loginfunc(request,user)
+            return redirect('index')
     else:
         form =  appforms.UserCreationForm()
     return render(request, 'groupsapp/register.html', {'form': form})

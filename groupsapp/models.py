@@ -5,6 +5,8 @@ import encrypted_model_fields.fields as e_models
 
 # Create your models here.
 # Profile Models
+
+
 class Member(models.Model):
     #First name, Surname and dob fields describe the member.
     first_name = e_models.EncryptedCharField(max_length=15)

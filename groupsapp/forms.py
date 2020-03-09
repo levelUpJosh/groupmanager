@@ -1,6 +1,6 @@
 from django.forms import EmailField
 from django import forms
-
+import django.contrib.auth.forms as contribforms
 from django.forms.widgets import SelectDateWidget
 
 import datetime
@@ -14,21 +14,35 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 
-class UserCreationForm(forms.ModelForm):
-    username = forms.CharField()
+class UserCreationForm(contribforms.UserCreationForm):
+    username = forms.CharField(label="Username")
+    first_name = forms.CharField(label="First Name")
+    last_name = forms.CharField(label="Last Name")
     password1= forms.CharField(label="Password",widget=forms.PasswordInput())
     password2 =forms.CharField(label="Confirm Password",widget=forms.PasswordInput())
     email = forms.EmailField(label=_("Email address"),required=True)
+    formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
+    this_year = datetime.date.today().year
+    years = range(this_year,this_year-100,-1)
+    dob = forms.DateField(label="Date of birth",input_formats=formats,widget=forms.SelectDateWidget(years=years))
 
+
+    def clean(self):
+        username = self.cleaned_data["username"]
+        email = self.cleaned_data["email"]
+        dob = self.cleaned_data["dob"]
+        print(dob)
+        #if not func.ValidateName(username):
+            #raise forms.ValidationError({'username': ["Name has invalid characters",]})
+        if 13 > ((datetime.date.today() - dob).days)/365.25:
+            raise forms.ValidationError({'dob': ["Users must be at least 13 years old",]})
     class Meta:
         model = appmodels.User
-        fields = ["username","email","password1","password2"]
+        fields = ["username","first_name","last_name","email","password1","password2"]
 
         def save(self, commit=True):
-            user = super(UserCreationForm,self).save(commit=False)
-            user.email = self.cleaned_data["email"]
-            if not func.ValidateName(username):
-                raise forms.ValidationError({'username': ["Name has invalid characters",]})
+            user = super(UserCreationForm,self).save()
+            print(dob)
             if commit:
                 user.save()
             return user
