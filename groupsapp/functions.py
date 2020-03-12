@@ -3,7 +3,6 @@ import string,random
 from django.forms import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 
-
 def CheckUserMemberLink(user,member_id):
 	members=GetAllUserMembers(user)
 	try:

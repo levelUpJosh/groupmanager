@@ -10,6 +10,7 @@ from django.contrib.auth import login as loginfunc
 from django.contrib.auth.models import User
 from django.contrib import messages
 
+import groupsapp.emails as emails
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     return context
@@ -82,10 +83,12 @@ def register(request):
             form.save()
             messages.success(request,'Account registered')
             username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
             user = authenticate(username=username,password=password)
             #login(request,user)
             loginfunc(request,user)
+            #emails.welcome(username,email)
             return redirect('index')
     else:
         form =  appforms.UserCreationForm()
