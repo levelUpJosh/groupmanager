@@ -76,10 +76,18 @@ def memberprofile(request,member_id):
 def groupprofile(request,group_id):
     if request.user.is_authenticated:
         group = appmodels.Group.objects.get(id=group_id)
-        groups = func.GetAllUserGroups(group)
-        for i in range(len(groups)):
-            if request.user in func.GetAllUserGroups(group)[i]:
-                groups1 = "ok"
+        usergroups = func.GetAllUserGroups(group)
+        membergroups = func.GetAllMemberGroups(request.user)
+        print(membergroups,flush=True)
+        groups1 = ""
+        for i in range(len(usergroups)):
+            #Checks if a user has admin control over this page
+            if request.user in usergroups[i]:
+                groups1 += "user"
+        for i in range(len(membergroups)):
+            #Checks if a user has read-only access
+            if group in membergroups[i][1]:
+                groups1 += "member"
 
         return HttpResponse(groups1)
 def register(request):
