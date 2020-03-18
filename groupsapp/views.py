@@ -73,8 +73,15 @@ def memberprofile(request,member_id):
     else:
         return redirect('login')
 
-def groupprofile(request,id):
-    pass
+def groupprofile(request,group_id):
+    if request.user.is_authenticated:
+        group = appmodels.Group.objects.get(id=group_id)
+        groups = func.GetAllUserGroups(group)
+        for i in range(len(groups)):
+            if request.user in func.GetAllUserGroups(group)[i]:
+                groups1 = "ok"
+
+        return HttpResponse(groups1)
 def register(request):
     
     if request.method == 'POST':
