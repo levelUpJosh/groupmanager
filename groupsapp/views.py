@@ -79,17 +79,13 @@ def groupprofile(request,group_id):
         usergroups = func.GetAllUserGroups(group)
         membergroups = func.GetAllMemberGroups(request.user)
         print(membergroups,flush=True)
-        groups1 = ""
+        edit = False
         for i in range(len(usergroups)):
             #Checks if a user has admin control over this page
             if request.user in usergroups[i]:
-                groups1 += "user"
-        for i in range(len(membergroups)):
-            #Checks if a user has read-only access
-            if group in membergroups[i][1]:
-                groups1 += "member"
+                edit = True
 
-        return HttpResponse(groups1)
+        return HttpResponse(edit)
 def register(request):
     
     if request.method == 'POST':

@@ -6,6 +6,9 @@ import encrypted_model_fields.fields as e_models
 # Create your models here.
 # Profile Models
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    dob = e_models.EncryptedDateField(name='dob',verbose_name='Date of Birth')
 
 class Member(models.Model):
     #First name, Surname and dob fields describe the member.
