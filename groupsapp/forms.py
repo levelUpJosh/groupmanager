@@ -75,12 +75,15 @@ class MemberCreationForm(forms.ModelForm):
         first_name = cleaned_data.get('first_name')
         last_name = cleaned_data.get('last_name')
         dob = cleaned_data.get('dob')
+        gender = cleaned_data.get('gender')
         if not first_name and not last_name and not dob:
             raise forms.ValidationError('Empty fields')
         if not func.ValidateName(first_name) or not func.ValidateName(last_name):
             raise forms.ValidationError('Invalid characters') 
         if dob > datetime.date.today():
             raise forms.ValidationError({'dob': ["Birthday cannot be in the future",]})
+        if gender == "U":
+            raise forms.ValidationError({'gender': ["Please choose Male/Female/Other,"]})
     class Meta:
         model = appmodels.Member
         fields = ["first_name","last_name","dob","gender"]

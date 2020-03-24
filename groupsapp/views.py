@@ -78,6 +78,15 @@ def memberprofile(request,member_id):
             return HttpResponse("No exist")
     else:
         return redirect('login')
+def delete_view(request,object_id,objectType):
+    if request.user.is_authenticated and request.method == "POST":
+        print("ok",flush=True)
+        if objectType == "member":
+            print("member",object_id)
+            if func.CheckUserMemberLink(request.user,object_id):
+                appmodels.Member.objects.get(id=object_id).delete()
+    return redirect('index')
+
 
 def groupprofile(request,group_id):
     if request.user.is_authenticated:
