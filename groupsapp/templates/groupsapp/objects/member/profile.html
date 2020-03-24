@@ -3,11 +3,41 @@
 <div class="row col-12">
     <div class="card">
         <div class="card-body">
-        {{member}}
-        {{member.dob}}
-        {{member.gender}}
-        {{user}}
-        {{groups}}
+        {% load static %}
+        <img src="{% static "images/profile.svg"%}">
+        <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <th scope="row">First Name</th>
+                <td>{{form.first_name}}</td>
+                </tr>
+                <tr>
+                <th scope="row">Last Name</th>
+                <td>{{form.last_name}}</td>
+                </tr>
+                <tr>
+                <th scope="row">Date Of Birth</th>
+                <td>{{form.dob}}</td>
+                </tr>
+                <tr>
+                <th scope="row">Gender</th>
+                <td>{{form.gender}}</td>
+                </tr>
+                <tr>
+                <th scope="row">Groups</th>
+                <td>
+                {% for group in groups%}
+                <a href="{% url 'group' group.id %}">{{group}}</a><br>
+                {%empty%}No Groups
+                {%endfor%}</td>
+                </tr>
+            </tbody>
+        </table>
         
         </div>
     </div>

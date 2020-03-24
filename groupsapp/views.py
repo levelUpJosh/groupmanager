@@ -63,9 +63,15 @@ def memberprofile(request,member_id):
     if request.user.is_authenticated:
         if func.CheckUserMemberLink(request.user,member_id):
             member = appmodels.Member.objects.get(id=member_id)
+            if request.method == "POST":
+                form = appforms.MemberCreationForm(request.POST, instance=member)
+                if form.is_valid():
+                    form.save()
+            form = appforms.MemberCreationForm(instance=member)
             context = {
                 'member': member,
-                'groups': func.GetAllMemberGroups(member),
+                'groups': func.GetAllMemberGroups(member)[1],
+                'form': form
             }
             return render(request,'groupsapp/objects/member/profile.html',context=context)
         else:

@@ -61,6 +61,7 @@ class MemberCreationForm(forms.ModelForm):
     last_name = forms.CharField(max_length=20,required=True)
     formats = ['%Y-%m-%d','%d/%m/%Y','%d/%m/%y']
     dob = forms.DateField(label="Date of birth",input_formats=formats)
+    gender = forms.ChoiceField(choices=appmodels.Member.GENDER_CHOICES)
     def __init__(self, *args, **kwargs):
         super(MemberCreationForm, self).__init__(*args, **kwargs)
         this_year = datetime.date.today().year
@@ -82,7 +83,7 @@ class MemberCreationForm(forms.ModelForm):
             raise forms.ValidationError({'dob': ["Birthday cannot be in the future",]})
     class Meta:
         model = appmodels.Member
-        fields = ["first_name","last_name","dob"]
+        fields = ["first_name","last_name","dob","gender"]
 
         def save(self, commit=True):
             member = super(MemberCreationForm,self).save(commit=False)
