@@ -7,7 +7,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="card col-md-6 mt-3 scoutpurple">
+    <div class="card col-md-6 mt-3">
         <div class="card-body">
             <h2 class="card-title text-center"> Members</h2>
             <div class="row">
@@ -54,16 +54,16 @@
         
     </div>
     {% if usergroups %}
-    <div class="card col-md-6 float-right mt-3">
+    <div class="card col-lg-6 float-right mt-3">
         <div class="card-body">
             <h2 class="card-title text-center">User Groups:</h2>
             <div class="row">
 
                 {% for group in usergroups %}
-                <div class="card col-lg-6">
+                <div class="card col-md-6">
                     <ul class="card-body list-group">
                         {% if group != 'No Group' %}
-                        <h5 class="card-title"><a href="{% url 'group' group.0.id %}">{{ group.0 }}</a></h5>
+                        <h5 class="card-title"><a href="{% url 'groupadmin' group.0.id %}">{{ group.0 }}</a></h5>
                         {%else%}
                         <h6 class="card-title">{{ group }}</h6>
                         <a class="card-title" href="{% url 'joingroup'%}">Use a join code to join a group</a>

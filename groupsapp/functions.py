@@ -104,6 +104,16 @@ def GetAllMemberGroups(search,by_group=False):
 	else:
 		return 'Unsupported object type. Please input a User or Member object'
 	return membertrack
+
+def GetAllMembersInGroup(search):
+	if search.__class__.__name__ == 'Group':
+		#print('member')
+		memberlist = appmodels.MemberGroupLink.objects.filter(group_id=search.pk)
+		memberlist = appmodels.Member.objects.filter(pk__in=memberlist.all().values_list('member_id'))
+		#print(grouplist.first().group_id,flush=True)
+		return memberlist
+	else:
+		return 'Unsupported object type. Please input a Group object'
 def GetAllUserGroups(search):
 	returnlist = []
 	if search.__class__.__name__ == 'User':
@@ -199,7 +209,10 @@ def UseJoinCode(code,member):
 			return 'Member/User and Group are already linked'
 	else:
 		return 'Code does not exist'
-
+def GetAllJoinCodes(group):
+	if group.__class__.__name__ == 'Group':
+		joincodes = appmodels.JoinCode.objects.filter(group=group)
+		return joincodes
 def ValidateName(name,digits=False):
 	letters = string.ascii_letters+" "
 	if digits == True:

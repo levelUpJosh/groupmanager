@@ -1,5 +1,11 @@
 {% extends 'base.html'%}
 {% block content %}
+{%if error%}
+<ul class="messages alert alert-danger">
+      <li class="success">{{error}}</li>
+    
+    </ul>
+{% endif%}
 <div class="card scoutpurple">
     <form action="{% url 'joingroup'%}" method="post" class="card-body">
         {% csrf_token %}

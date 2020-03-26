@@ -117,7 +117,7 @@ class GroupCreationForm(forms.ModelForm):
 
 class JoinCodeForm(forms.Form):
     code = forms.CharField(max_length=8)
-    member = forms.ModelChoiceField(appmodels.Member.objects.none(),label="Select Member: ")
+    member = forms.ModelChoiceField(appmodels.Member.objects.none(),label="Select Member: ",required=False)
     def __init__(self, *args, **kwargs):
         queryset = appmodels.Member.objects.none()
 
@@ -149,6 +149,22 @@ class JoinCodeForm(forms.Form):
             raise forms.ValidationError('Invalid characters')
         #if error != True:
             #raise forms.ValidationError(error)
+
+class NewJoinCodeForm(forms.Form):
+    maxno = forms.IntegerField(min_value=1)
+    role = forms.ChoiceField()
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop('choices')
+        super(NewJoinCodeForm, self).__init__(*args, **kwargs)
+        self.fields['role'].choices = choices
+        print(choices)
+
+    def clean(self):
+        cleaned_data = super(NewJoinCodeForm, self).clean()
+        maxno = cleaned_data.get('maxno')
+        role = cleaned_data.get('role')
+        if not maxno and not role:
+            raise forms.ValidationError('Empty fields')
 
 """class JoinCodeForm(forms.Form):
     def __init__(self,*args,**kwargs):

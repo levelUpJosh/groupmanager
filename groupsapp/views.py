@@ -1,6 +1,7 @@
 from django.shortcuts import render,get_object_or_404,redirect
 
 # Create your views here.
+from django.urls import reverse
 from django.http import HttpResponse
 import groupsapp.forms as appforms
 import groupsapp.models as appmodels
@@ -91,16 +92,62 @@ def delete_view(request,object_id,objectType):
 def groupprofile(request,group_id):
     if request.user.is_authenticated:
         group = appmodels.Group.objects.get(id=group_id)
-        usergroups = func.GetAllUserGroups(group)
         membergroups = func.GetAllMemberGroups(request.user)
         print(membergroups,flush=True)
-        edit = False
-        for i in range(len(usergroups)):
-            #Checks if a user has admin control over this page
-            if request.user in usergroups[i]:
-                edit = True
 
-        return HttpResponse(edit)
+        return HttpResponse(group)
+def groupadmin(request,group_id):
+    if request.user.is_authenticated:
+        group = appmodels.Group.objects.get(id=group_id)
+        joincodes = func.GetAllJoinCodes(group)
+        users = func.GetAllUserGroups(group)
+        members = func.GetAllMembersInGroup(group)
+        for i in range(len(users)):
+            #Checks if a user has admin control over this page
+            if request.user in users[i]:
+                if users[i][1] == 'admin':
+                    choices = [('member','member'),('leader','leader')]
+                else:
+                    choices = [('member','member')]
+                #print(users[i])
+                context = {
+                    'group': group,
+                    'users': users,
+                    'members': members,
+                    'joincodes': joincodes,
+                    'codeform': appforms.NewJoinCodeForm(choices=choices),
+                    'role': users[i][1],
+                }
+                return render(request,'groupsapp/objects/group/admin.html',context=context)
+    return redirect('index')
+
+
+def groupadmintask(request,group_id,admin=False,*args,**kwargs):
+    group = appmodels.Group.objects.get(id=group_id)
+    usergroups = func.GetAllUserGroups(group)
+    for i in range(len(usergroups)):
+        #Checks if a user has admin control over this page
+        if request.user in usergroups[i]:
+            admin = True
+    if request.user.is_authenticated and admin == True and request.method=="POST":
+        task = kwargs.get('task')
+        if task == "remove_member":
+            member_id = kwargs.get('member_id')
+            appmodels.MemberGroupLink.objects.get(member_id=member_id,group_id=group.id).delete()
+        elif task == "delete_code":
+            code = kwargs.get('code')
+            print(code)
+            #For security reasons, the get command considers both the group id and the code, not just the code.
+            #This should minimise the ability to delete objects not belonging to a user
+            appmodels.JoinCode.objects.get(code=code,group=group.id).delete()
+        elif task == "generate_code":
+            print("gen")
+            form = appforms.NewJoinCodeForm(request.POST)
+            if form.is_valid():
+                func.GenerateJoinCode(group,role=form.cleaned_data['role'],maxno=form.cleaned_data['maxno'])
+        return redirect("groupadmin",group_id)
+    return HttpResponse(status=204)
+
 def register(request):
     
     if request.method == 'POST':
@@ -134,7 +181,7 @@ def add_member(request):
             form = appforms.MemberCreationForm()
         return render(request, 'groupsapp/components/addmember.html', {'form': form})
     else:
-        return HttpResponse('User not logged in',status=403)
+        return redirect('index')
 
 def add_group(request):
     if request.user.is_authenticated:
@@ -150,7 +197,7 @@ def add_group(request):
             form = appforms.GroupCreationForm()
         return render(request, 'groupsapp/components/addgroup.html', {'form': form})
     else:
-        return HttpResponse('User not logged in',status=403)
+        return redirect('index')
 
 def join_group(request,error=''):
     print(request.user,flush=True)
@@ -162,18 +209,23 @@ def join_group(request,error=''):
                 if code[0] == 'M':
                     member=form.cleaned_data['member']
                     code = func.UseJoinCode(code,member)
-                    messages.success(request,'Group joined')
                 else:
                     code = func.UseJoinCode(code,request.user)
-                    messages.success(request,'Group joined')
+                    
                 if code != True:
-                    form = appforms.JoinCodeForm(request=request,error=code)
+                    error = code
+                    form = appforms.JoinCodeForm(request=request)
+                else:
+                    messages.success(request,'Group joined')
         else:
             form = appforms.JoinCodeForm(request=request)
-        return render(request, 'groupsapp/components/joingroup.html', {'form': form})
+            error ='' 
+        return render(request, 'groupsapp/components/joingroup.html', {'form': form,'error':error})
     else:
-        return HttpResponse('User not logged in',status=403)
+        return redirect('index')
 
+def access_denied(request):
+    return render(status=403)
 """ def login(request):
     if request.method == 'POST':
         form = """

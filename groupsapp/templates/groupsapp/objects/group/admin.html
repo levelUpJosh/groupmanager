@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load widget_tweaks %}
+<div class="row col-12">
+    <div class="card col-lg-5 scoutpurple">
+        
+        <div class="card-body">
+        <h1 class="card-title">{{group}}</h1>
+        {{group.get_group_type_display}} | {{role}}
+        </div>
+    </div>
+</div>
+<div class="row col-12">
+    <div class="card col-12">
+        <div class="card-body">
+            <h1 class="card-title">Members</h1>
+            <p class="card-text">
+            The table below shows all the members associated with this group.
+            </p>
+            {% if members %}
+            <table class="table" id="membertable">
+                <thead>
+                    <th scope="col" onclick="sortTable(0)" style="cursor:pointer">First Name</th>
+                    <th scope="col" onclick="sortTable(1)">Last Name</th>
+                    <th scope="col" onclick="sortTable(2)">Gender</th>
+                    <th scope="col" onclick="sortTable(3)">Date Of Birth</th>
+                    <th scope="col">Options</th>
+                </thead>
+                <tbody>
+                {% for member in members%}
+                <tr>
+                <th scope="row">{{member.first_name}}</th>
+                <th scope="row">{{member.last_name}}</th>
+                <td>{{member.gender}}</td>
+                <td>{{member.dob}}</td>
+                <form action="{% url 'removegroupmember' group.id 'remove_member' member.id%}" method="post">
+                    {% csrf_token %}
+                    <td><button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button></td>
+                </form>
+                </tr>
+                {%endfor%}
+                </tbody>
+            </table>
+            {% else %}
+            <p> You have no members to display. <br>Create and share join codes to your members to add them to your group.<p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="row col-12">
+    <div class="card col-12">
+        <div class="card-body">
+            <h1 class="card-title">Users</h1>
+            <p class="card-text">
+            The table below shows all the admin users associated with this group.
+            </p>
+            {% if users %}
+            <table class="table" id="usertable">
+                <thead>
+                    <th scope="col" onclick="sortTable(0)" style="cursor:pointer">Username</th>
+                    <th scope="col" onclick="sortTable(1)">Role</th>
+                    <th scope="col" onclick="sortTable(2)">Email</th>
+                    <th scope="col">Options</th>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                <tr>
+                <th scope="row">{{user.0.username}}</th>
+                <td>{{user.1}}</td>
+                <td>{{user.0.email}}</td>
+
+                {% if role == 'admin' and user.1 == 'leader'%}
+                <form action="{% url 'removegroupuser' group.id 'remove_user' user.0.id%}" method="post">
+                    {% csrf_token %}
+                    <td><button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button></td>
+                </form>
+                {% endif %}
+                </tr>
+                {%endfor%}
+                </tbody>
+            </table>
+            {% else %}
+            <p> You have no members to display. <br>Create and share join codes to your members to add them to your group.<p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="row col-12">
+    <div class="card col-12">
+        <div class="card-body">
+            <h1 class="card-title">Join Codes</h1>
+            <p class="card-text">Join codes allow members to add their profile to your group</p>
+            <form action="{% url 'formtask' group.id 'generate_code'%}" method="post">
+                {%csrf_token%}
+                <table id="newcode" class="table">
+                    <thead>
+                        <th scope="col">Max no. of uses</th>
+                        <th scope="col">Role</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{% render_field codeform.maxno class="form-control"%}</td>
+                            <td>{% render_field codeform.role class="form-control"%}</td>
+                            <td><button onclick="reload()" action="submit" class="btn btn-outline-primary">Generate Code</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            {% if joincodes %}
+            <table class="table">
+                <thead>
+                    <th scope="col"> Code</th>
+                    <th scope="col"> Remaining uses</th>
+                    <th scope="col"> Role </th>
+                    <th scope="col"> Options</th>
+                </thead>
+                <tbody>
+                {% for code in joincodes %}
+                    <tr>
+                        <td>{{code}}</td>
+                        <td>{{code.maxno}}</td>
+                        <td>{{code.role}}</td>
+                        <form action="{% url 'deletecode' group.id 'delete_code' code.code %}" method="post">
+                        {%csrf_token%}
+                        <td><button action="submit" class="btn btn-outline-danger">Delete</button></td>
+                        </form>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% if role == 'admin'%}
+<div class="row col-12">
+    <div class="card col-12">
+        <div class="card-body">
+            <h1 class="card-title">Group Tools</h1>
+            <p class="card-text">This section is only visible to admins and not leaders</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
