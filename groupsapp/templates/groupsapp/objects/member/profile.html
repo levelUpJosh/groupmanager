@@ -34,13 +34,27 @@
                         <tr>
                         <th scope="row">Groups</th>
                         <td>
-                        {% for group in groups%}
-                        <a href="{% url 'group' group.id %}">{{group}}</a><br>
-                        {% if owned_by_user == True or group.id == group_id%}
-                        <button type="submit" class="btn btn-outline-danger">Leave</button>
-                        {% endif %}
-                        {%empty%}No Groups
-                        {%endfor%}</td>
+                        <table class="table">
+                            <tbody>
+                                {% for group in groups%}
+                                <tr>
+                                    <td><a href="{% url 'group' group.id %}">{{group}}</a></td>
+                                    <td>
+                                    {% if owned_by_user == True%}
+                                    <button type="submit" class="btn btn-outline-danger">Leave</button>
+                                    {% elif group.id == group_id%}
+                                    <form action="{% url 'removegroupmember' group_id 'remove_member' member.id%}" method="post">
+                                        {% csrf_token %}
+                                        <button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button>
+                                    </form>
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                                {%empty%}No Groups
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                        </td>
                         </tr>
                     </tbody>
                 </table>

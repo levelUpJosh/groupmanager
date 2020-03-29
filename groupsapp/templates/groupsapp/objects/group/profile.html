@@ -1,12 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load widget_tweaks %}
 <div class="row col-12">
-    <div class="card">
+    <div class="card col-lg-5 scoutpurple">
         <div class="card-body">
-        {{group}}
-        {{group.group_type}}
-        {{is_admin}}
+        <h1 class="card-title">{{group}}</h1>
+        {{group.get_group_type_display}} | Overview
         </div>
     </div>
+</div>
+<div class="row col-12">
+    {% if members %}
+    <div class="card col-12">
+        <div class="card-body">
+            <h2 class="card-title">Your members</h2>
+            <a>These are the members you have in {{group}}</a>
+            <table class="table">
+                <thead>
+                    <th scope="col">Name</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </thead>
+                <tbody>
+                    {% for member in members%}
+                    <tr>
+                        <td>{{member}}</td>
+                        <td>
+                            <form action="{% url 'member' member.id%}" method="post">
+                                {% csrf_token %}
+                                <button action="submit" onclick="reload()" class="btn btn-outline-primary">Edit</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{% url 'removegroupmember' group.id 'remove_member' member.id%}" method="post">
+                                {% csrf_token %}
+                                <button action="submit" onclick="reload()" class="btn btn-outline-danger">Leave</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    {% if role %}
+    <div class="card col-12">
+        <div class="card-body">
+            <h3 class="card-title">Manage {{group}}</h3>
+            <p class="card-text">You have {{role}} access to this group. Click below to access the dashboard:</p>
+            <form action="{% url 'groupadmin' group.id%}">
+                <button action="submit" class="btn btn-outline-primary">Dashboard</button>
+            </form>
+        </div>
+    </div>
+    {%endif%}
 </div>
 {% endblock %}

@@ -25,7 +25,7 @@ SECRET_KEY = 'wl%5&lm!es&#@grtx0+ddjwd879^qxhsupz1w^-@k-4gq$+k3y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "192.168.0.64","127.0.0.1"]
 
 AUTH_PROFILE_MODULE = "groupsapp.UserProfile"
 STATIC_URL = '/static/'

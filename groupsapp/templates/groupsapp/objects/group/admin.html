@@ -6,7 +6,7 @@
         
         <div class="card-body">
         <h1 class="card-title">{{group}}</h1>
-        {{group.get_group_type_display}} | {{role}}
+        <a>{{group.get_group_type_display}} | {{role}} | <form class="d-inline" action="{% url 'group' group.id%}"><button action="submit" class="btn btn-sm btn-primary">Group Homepage</button></form></a>
         </div>
     </div>
 </div>
@@ -65,16 +65,16 @@
             <table class="table" id="usertable">
                 <thead>
                     <th scope="col" onclick="sortTable(0)" style="cursor:pointer">Username</th>
-                    <th scope="col" onclick="sortTable(1)">Role</th>
-                    <th scope="col" onclick="sortTable(2)">Email</th>
+                    <th scope="col" class="d-none d-md-table-cell" onclick="sortTable(1)">Role</th>
+                    <th scope="col" class="d-none d-md-table-cell" onclick="sortTable(2)">Email</th>
                     <th scope="col">Options</th>
                 </thead>
                 <tbody>
                 {% for user in users %}
                 <tr>
                 <th scope="row">{{user.0.username}}</th>
-                <td>{{user.1}}</td>
-                <td>{{user.0.email}}</td>
+                <td class="d-none d-md-table-cell">{{user.1}}</td>
+                <td class="d-none d-md-table-cell">{{user.0.email}}</td>
 
                 {% if role == 'admin' and user.1 == 'leader'%}
                 <form action="{% url 'removegroupmember' group.id 'remove_user' user.0.id %}" method="post">
@@ -90,6 +90,7 @@
                 </form>
                 {% endif %}
                 </tr>
+                <tr><td class="d-block d-md-none">{{user.0.email}}</td></tr>
                 {%endfor%}
                 </tbody>
             </table>

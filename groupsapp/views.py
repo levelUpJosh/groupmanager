@@ -91,6 +91,10 @@ def memberprofile(request,member_id,group_id=None):
     else:
         return redirect('login')
 
+def memberprofiletask(request,member_id,*args,**kwargs):
+    return HttpResponse(status=204)
+
+
 def delete_view(request,object_id,objectType):
     if request.user.is_authenticated and request.method == "POST":
         print("ok",flush=True)
@@ -105,9 +109,31 @@ def groupprofile(request,group_id):
     if request.user.is_authenticated:
         group = appmodels.Group.objects.get(id=group_id)
         membergroups = func.GetAllMemberGroups(request.user)
-        print(membergroups,flush=True)
+        usergroups = func.GetAllUserGroups(request.user)
+        members = []
+        userrole = None
+        has_access = False
+        for link in membergroups:
+            if group in link[1]:
+                members += [link[0]]
+                has_access = True
+        for link in usergroups:
+            if group in link:
+                has_access = True
+                userrole = link[1]
+        context ={
+            'group': group,
+            'user': request.user,
+            'role': userrole,
+            'members': members,
+        }
+        if has_access == True:
+            return render(request,'groupsapp/objects/group/profile.html',context=context)
+        else:
+            messages.error(request, "Access Denied or Group Not Found")
+            return redirect('index')
 
-        return HttpResponse(group)
+
 def groupadmin(request,group_id):
     if request.user.is_authenticated:
         group = appmodels.Group.objects.get(id=group_id)
@@ -150,8 +176,8 @@ def groupadmintask(request,group_id,admin=False,*args,**kwargs):
                 role = 'admin'
             else:
                 role ='leader'
+    task = kwargs.get('task')
     if request.user.is_authenticated and admin == True and request.method=="POST":
-        task = kwargs.get('task')
         if task == "remove_member":
             #Obtain the specific MemberGroupLink for the member_id and group_id and delete the database record.
             member_id = kwargs.get('object_id')
@@ -180,7 +206,7 @@ def groupadmintask(request,group_id,admin=False,*args,**kwargs):
                 messages.success(request,'Join code generated: '+code.code)
         elif task == "leave_group":
             appmodels.UserGroupLink.objects.get(group_id=group.id,user_id=request.user.id).delete()
-            messages.success(request,"Successfully left "+group.name+". To rejoin, another join code must be issued.")
+            messages.success(request,"Successfully left "+group.group_name+". To rejoin, another join code must be issued.")
             return redirect('index')
         if role == 'admin':
             if task == "remove_user":
@@ -194,6 +220,18 @@ def groupadmintask(request,group_id,admin=False,*args,**kwargs):
                 messages.success(request,"Group deleted")
                 return redirect('index')
         return redirect("groupadmin",group_id)
+    else:
+        #Users should also be able to remove their own members from groups as well.
+        if task == 'remove_member':
+            member_id = kwargs.get('object_id')
+            #Check if user has direct ownership of the given member
+            if func.CheckUserMemberLink(request.user,member_id):
+                #delete link
+                appmodels.MemberGroupLink.objects.get(member_id=member_id,group_id=group.id).delete()
+                #Show success message
+                messages.success(request,'Member successfully removed from '+group.group_name)
+                return redirect('index')
+
     return HttpResponse(status=204)
     # We only return a HttpResponse containing the status 204 (No content)
     # This tells the browser not to render a new page or change the URL which means that users appear to not leave the admin page
