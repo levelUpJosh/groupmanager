@@ -14,10 +14,10 @@ urlpatterns = [
     path('<str:objectType>/<int:object_id>/delete/', views.delete_view, name='deleteobject'),
     path('group/<int:group_id>/', views.groupprofile, name="group"),
     path('group/<int:group_id>/admin/', views.groupadmin, name="groupadmin"),
-    path('group/<int:group_id>/admin/<str:task>/<int:member_id>/', views.groupadmintask, name="removegroupmember"),
-    path('group/<int:group_id>/admin/<str:task>/<int:user_id>/', views.groupadmintask, name="removegroupuser"),
+    path('group/<int:group_id>/admin/<str:task>/<int:object_id>/', views.groupadmintask, name="removegroupmember"),
     path('group/<int:group_id>/admin/<str:task>/<str:code>/', views.groupadmintask, name="deletecode"),
     path('group/<int:group_id>/admin/<str:task>/', views.groupadmintask, name="formtask"),
+    path('group/<int:group_id>/admin/member/<int:member_id>', views.memberprofile, name="editgroupmember"),
     
 
 ]

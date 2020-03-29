@@ -17,7 +17,12 @@ def CheckUserMemberLink(user,member_id):
 	else:
 		#If user does not have access to the member, then act as though it doesn't exist.
 		return False
-
+def CheckMemberGroupLink(group_id,member_id):
+	try:
+		check = appmodels.MemberGroupLink.objects.get(group_id=group_id,member_id=member_id)
+		return True
+	except ObjectDoesNotExist:
+		return False
 
 def GetAllUserMembers(search):
 	if search.__class__.__name__ == 'User':
@@ -147,12 +152,13 @@ def CheckJoinCodeNotUsed(member,group):
 	try:
 		if inputObjectType == 'Member':
 			appmodels.MemberGroupLink.objects.get(group=group,member=member)
-		if inputOobjectType == 'User':
+		if inputObjectType == 'User':
 			appmodels.UserGroupLink.objects.get(group=group,user=member)
-
+		print('exist')
 		return False
 	except:
-		return True
+	 	return True 
+	 	print('no exist')
 def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
 	#An odd issue of using random sequences of the full alphabet is that there is a small chance that the code could spell out words, some of which groups may not wish to distribute to parents.
@@ -183,6 +189,7 @@ def UseJoinCode(code,member):
 	inputObjectType = member.__class__.__name__
 	if JoinObject != False:
 		is_not_used = CheckJoinCodeNotUsed(member,JoinObject.group)
+		print(is_not_used)
 		group = appmodels.Group.objects.get(pk=JoinObject.group_id) # What if the group no longer exists. I suppose a delete group function would also scrap the joincodes
 		if is_not_used == True and JoinObject.role == 'member':
 			if inputObjectType == 'Member':

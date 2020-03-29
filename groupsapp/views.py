@@ -12,25 +12,30 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 import groupsapp.emails as emails
-def get_context_data(self, **kwargs):
+""" def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     return context
-
+ """
 def login(request):
+    #Custom login page provided via a form from forms.py
     if request.method == 'POST':
+        #Load form
         form = appforms.UserLoginForm(request.POST)
+        #Check if the form returned is valid
         if form.is_valid():
-            #form.save()
+            #Extract the relevant information from the form
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            #Use the information to attempt to verify the account exists and is a valid password
             user = authenticate(username=username,password=password)
-            print(user,username,password)
+            #If the authenticate line doesn't work it will return None, so check that user is not None
             if user is not None:
                 messages.success(request,'Account Logged in')
-            #request.login(user)
+                #Use django's login function (defined with a different name due to conflict with this functions name) to initiate the user session
                 loginfunc(request,user)
-                print("PPPP")
+
             else:
+                #Return a helpful error message if the username or password is wrong
                 messages.error(request,'Username or password is incorrect')
             return redirect('index')
     else:
@@ -60,9 +65,12 @@ def index(request):
         return redirect('login')
 
 
-def memberprofile(request,member_id):
+def memberprofile(request,member_id,group_id=None):
     if request.user.is_authenticated:
-        if func.CheckUserMemberLink(request.user,member_id):
+        #The lines below define whether the current request has access due to user rights or indirectly by accessing via a group.
+        owned_by_user = func.CheckUserMemberLink(request.user,member_id)
+        owned_by_group = func.CheckMemberGroupLink(group_id,member_id)
+        if owned_by_user or owned_by_group:
             member = appmodels.Member.objects.get(id=member_id)
             if request.method == "POST":
                 form = appforms.MemberCreationForm(request.POST, instance=member)
@@ -71,6 +79,9 @@ def memberprofile(request,member_id):
             form = appforms.MemberCreationForm(instance=member)
             context = {
                 'member': member,
+                'owned_by_user': owned_by_user,
+                'owned_by_group': owned_by_group,
+                'group_id': group_id, # This exists to allow us to prevent admins of one group removing a member from another
                 'groups': func.GetAllMemberGroups(member)[1],
                 'form': form
             }
@@ -79,6 +90,7 @@ def memberprofile(request,member_id):
             return HttpResponse("No exist")
     else:
         return redirect('login')
+
 def delete_view(request,object_id,objectType):
     if request.user.is_authenticated and request.method == "POST":
         print("ok",flush=True)
@@ -113,6 +125,7 @@ def groupadmin(request,group_id):
                 context = {
                     'group': group,
                     'users': users,
+                    'pageuser': request.user,
                     'members': members,
                     'joincodes': joincodes,
                     'codeform': appforms.NewJoinCodeForm(choices=choices),
@@ -123,30 +136,67 @@ def groupadmin(request,group_id):
 
 
 def groupadmintask(request,group_id,admin=False,*args,**kwargs):
+    # This view acts as an interface for the group admin pages to carry out functions involving adjusting the live database 
     group = appmodels.Group.objects.get(id=group_id)
+    #get the Group object
     usergroups = func.GetAllUserGroups(group)
+    #obtain the queryset of all User objects that have access to this group
+    print(kwargs)
     for i in range(len(usergroups)):
         #Checks if a user has admin control over this page
         if request.user in usergroups[i]:
             admin = True
+            if usergroups[i][1] == 'admin':
+                role = 'admin'
+            else:
+                role ='leader'
     if request.user.is_authenticated and admin == True and request.method=="POST":
         task = kwargs.get('task')
         if task == "remove_member":
-            member_id = kwargs.get('member_id')
+            #Obtain the specific MemberGroupLink for the member_id and group_id and delete the database record.
+            member_id = kwargs.get('object_id')
             appmodels.MemberGroupLink.objects.get(member_id=member_id,group_id=group.id).delete()
+            messages.success(request,'Member removed')
+            
         elif task == "delete_code":
+            #For security reasons, the program considers both the group id and the code, not just the code.
+            #This should minimise the ability to delete joincode objects not belonging to a user/group.
             code = kwargs.get('code')
-            print(code)
-            #For security reasons, the get command considers both the group id and the code, not just the code.
-            #This should minimise the ability to delete objects not belonging to a user
             appmodels.JoinCode.objects.get(code=code,group=group.id).delete()
+            messages.success(request,'Code deleted')
+
         elif task == "generate_code":
-            print("gen")
-            form = appforms.NewJoinCodeForm(request.POST)
+            #This code should mirror the relevant code in the groupadmin view
+            if role == 'admin':
+                choices = [('member','member'),('leader','leader')]
+            else:
+                choices = [('member','member')]
+            #Receive the data from the admin page as a form which includes maxno and role as well as the group_id.
+            form = appforms.NewJoinCodeForm(request.POST,choices=choices)
+            
+
             if form.is_valid():
-                func.GenerateJoinCode(group,role=form.cleaned_data['role'],maxno=form.cleaned_data['maxno'])
+                code =func.GenerateJoinCode(group,role=form.cleaned_data['role'],maxno=form.cleaned_data['maxno'])
+                messages.success(request,'Join code generated: '+code.code)
+        elif task == "leave_group":
+            appmodels.UserGroupLink.objects.get(group_id=group.id,user_id=request.user.id).delete()
+            messages.success(request,"Successfully left "+group.name+". To rejoin, another join code must be issued.")
+            return redirect('index')
+        if role == 'admin':
+            if task == "remove_user":
+                user_id = kwargs.get('object_id')
+                print(user_id,group_id)
+                appmodels.UserGroupLink.objects.get(group_id=group.id,user_id=user_id).delete()
+                messages.success(request,'User removed')
+
+            elif task == "delete_group":
+                group.delete()
+                messages.success(request,"Group deleted")
+                return redirect('index')
         return redirect("groupadmin",group_id)
     return HttpResponse(status=204)
+    # We only return a HttpResponse containing the status 204 (No content)
+    # This tells the browser not to render a new page or change the URL which means that users appear to not leave the admin page
 
 def register(request):
     

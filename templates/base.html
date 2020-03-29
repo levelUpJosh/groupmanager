@@ -51,7 +51,7 @@
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">Group Tools</a>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{% url 'joingroup'%}">Join Group</a>
-                <a class="dropdown-item" href="{% url 'joingroup'%}">Create Group</a>
+                <a class="dropdown-item" href="{% url 'addgroup'%}">Create Group</a>
               </div>
             </ul>
           </ul>
@@ -65,10 +65,11 @@
       </nav>
     {% if messages %}
     {% for message in messages %}
-    <ul class="messages alert {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}alert-primary{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}alert-danger{% endif %} ">
+    <ul style="list-style-type:none;" class="messages alert {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}alert-primary{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}alert-danger{% endif %} ">
       <li class="{{ message.tags }}">{{ message }}</li>
+      </ul>
     {% endfor %}
-    </ul>
+    
     {% endif %}
     {% endblock %}
     {% block content %}

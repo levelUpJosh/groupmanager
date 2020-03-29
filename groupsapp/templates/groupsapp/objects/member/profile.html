@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 {% block content %}
 <div class="row col-12">
-    <div class="card">
+    <div class="card col-lg-6 col-xl-5">
         <div class="card-body">
             {% load static %}
             <img src="{% static "images/profile.svg"%}">
@@ -36,6 +36,9 @@
                         <td>
                         {% for group in groups%}
                         <a href="{% url 'group' group.id %}">{{group}}</a><br>
+                        {% if owned_by_user == True or group.id == group_id%}
+                        <button type="submit" class="btn btn-outline-danger">Leave</button>
+                        {% endif %}
                         {%empty%}No Groups
                         {%endfor%}</td>
                         </tr>
@@ -43,9 +46,14 @@
                 </table>
                 <button type="submit" class="btn btn-primary">Save</button>
             </form>
-            <br>
-            <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deletionModal">Delete this member</button>
-
+            {% if owned_by_user == True%}
+            <div class="row col-12">
+                
+                <br><br>
+                
+                <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deletionModal">Delete this member</button>
+            
+            </div>
             <!-- Member Deletion warning -->
             <div class="modal fade" id="deletionModal" tabindex="-1" role="dialog" aria-labelledby="deletionModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -69,6 +77,15 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class="row col-12">
+                
+
+                
+                <button type="button" class="btn btn-outline-danger" disabled>Only parents/guardians can completely delete a members profile</button>
+            
+            </div>
+            {% endif%}
         </div>
     </div>
 </div>

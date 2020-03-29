@@ -33,10 +33,17 @@
                 <th scope="row">{{member.last_name}}</th>
                 <td>{{member.gender}}</td>
                 <td>{{member.dob}}</td>
+                <td>
+                <form action="{% url 'editgroupmember' group.id member.id%}" method="post">
+                    {% csrf_token %}
+                    <button action="submit" onclick="reload()" class="btn btn-outline-primary">Edit</button>
+                </form>
                 <form action="{% url 'removegroupmember' group.id 'remove_member' member.id%}" method="post">
                     {% csrf_token %}
-                    <td><button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button></td>
+                    <button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button>
                 </form>
+                
+                </td>
                 </tr>
                 {%endfor%}
                 </tbody>
@@ -70,9 +77,16 @@
                 <td>{{user.0.email}}</td>
 
                 {% if role == 'admin' and user.1 == 'leader'%}
-                <form action="{% url 'removegroupuser' group.id 'remove_user' user.0.id%}" method="post">
+                <form action="{% url 'removegroupmember' group.id 'remove_user' user.0.id %}" method="post">
                     {% csrf_token %}
                     <td><button action="submit" onclick="reload()" class="btn btn-outline-danger">Remove</button></td>
+                </form>
+                {% endif %}
+                
+                {% if user.0.id == pageuser.id and role == 'leader' %}
+                <form action="{% url 'formtask' group.id 'leave_group'%}" method="post">
+                    {% csrf_token %}
+                    <td><button action="submit" onclick="reload()" class="btn btn-outline-danger">Leave Group</button></td>
                 </form>
                 {% endif %}
                 </tr>
@@ -80,7 +94,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p> You have no members to display. <br>Create and share join codes to your members to add them to your group.<p>
+            <p> You have no users to display. <br>Create and share join codes to your members to add them to your group.<p>
             {% endif %}
         </div>
     </div>
@@ -116,6 +130,7 @@
                 </thead>
                 <tbody>
                 {% for code in joincodes %}
+                    {% if role == "leader" and code.role == 'member' or role == 'admin'%}
                     <tr>
                         <td>{{code}}</td>
                         <td>{{code.maxno}}</td>
@@ -125,6 +140,7 @@
                         <td><button action="submit" class="btn btn-outline-danger">Delete</button></td>
                         </form>
                     </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
             </table>
@@ -138,6 +154,38 @@
         <div class="card-body">
             <h1 class="card-title">Group Tools</h1>
             <p class="card-text">This section is only visible to admins and not leaders</p>
+            <div class="card">
+                <div class="card-body"> 
+                    <h3 class="card-title">Delete group</h3>
+                    <p>Click the button below if you wish to delete your group from our system.<br> 
+                    This will also unlink all parent records from your records. <b>However</b> the information will remain on our system unless parents/guardians choose to delete their member's profile
+                    <br><br><b>WARNING: This action is permanent and cannot be undone</b></p>
+                    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deletionModal">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Group Deletion warning -->
+<div class="modal fade" id="deletionModal" tabindex="-1" role="dialog" aria-labelledby="deletionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletionModalLabel">Delete Group: {{group}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete your group? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" data-dismiss="modal">Cancel</button>
+                <form action="{% url 'formtask' group.id 'delete_group' %} " method="post">
+                {%csrf_token%}
+                <button type="submit" class="btn btn-danger" action=>Delete</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
