@@ -25,24 +25,34 @@ class UserCreationForm(contribforms.UserCreationForm):
     this_year = datetime.date.today().year
     years = range(this_year,this_year-100,-1)
     dob = forms.DateField(label="Date of birth",input_formats=formats,widget=forms.SelectDateWidget(years=years))
-
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.user = kwargs.get('instance')
 
     def clean(self):
         username = self.cleaned_data["username"]
         email = self.cleaned_data["email"]
-        dob = self.cleaned_data["dob"]
-        print(dob)
-        #if not func.ValidateName(username):
-            #raise forms.ValidationError({'username': ["Name has invalid characters",]})
-        if 13 > ((datetime.date.today() - dob).days)/365.25:
-            raise forms.ValidationError({'dob': ["Users must be at least 13 years old",]})
+        dob = self.cleaned_data.get("dob")
+        if dob and (18 > ((datetime.date.today() - dob).days)/365.25):
+            raise forms.ValidationError({'dob': ["Users must be at least 18 years old due to data consent laws",]})
+        if self.user:
+            #If user is not given then exclude user id = 0 which will not affect the query
+            user_id = self.user.id
+        else:
+            user_id = 0
+        if not func.ValidateName(username):
+            raise forms.ValidationError({'username': ["Name has invalid characters",]})
+        if appmodels.User.objects.filter(username=username).exclude(id=user_id).exists():
+            raise forms.ValidationError({'username': ["Username is not available",]})
+        if appmodels.User.objects.filter(email=email).exclude(id=user_id).exists():
+            raise forms.ValidationError({'email': ["Email is already taken",]})
+        
     class Meta:
         model = appmodels.User
-        fields = ["username","first_name","last_name","email","password1","password2"]
+        fields = ["username","email","first_name","last_name","dob","password1","password2"]
 
         def save(self, commit=True):
-            user = super(UserCreationForm,self).save()
-            print(dob)
+            user = super(UserCreationForm,self).save(commit=False)
             if commit:
                 user.save()
             return user

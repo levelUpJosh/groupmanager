@@ -64,6 +64,16 @@ def index(request):
     else:
         return redirect('login')
 
+def userprofile(request):
+    if request.user.is_authenticated:
+        user = request.user
+        context = {
+            'user': user,
+            'groups': func.GetAllUserGroups(user),
+        }
+        return render(request,'groupsapp/objects/user/profile.html',context=context)
+    else:
+        return redirect('login')
 
 def memberprofile(request,member_id,group_id=None):
     if request.user.is_authenticated:
@@ -97,11 +107,25 @@ def memberprofiletask(request,member_id,*args,**kwargs):
 
 def delete_view(request,object_id,objectType):
     if request.user.is_authenticated and request.method == "POST":
-        print("ok",flush=True)
         if objectType == "member":
-            print("member",object_id)
             if func.CheckUserMemberLink(request.user,object_id):
                 appmodels.Member.objects.get(id=object_id).delete()
+                messages.success(request,'Member deleted')
+        if objectType == "user":
+            #Check the user attempting to delete their account is this user
+            #Also check that User is not an admin of any groups as that will break the group
+            if object_id == request.user.id:
+                if not func.UserIsAdmin(request.user):
+                    
+                    for member in func.GetAllUserMembers(request.user):
+                        print(member)
+                        member.delete()
+                    appmodels.User.objects.get(id=object_id).delete()
+                    messages.success(request,'User deleted')
+
+                else:
+                    messages.error(request,"User could not be deleted due to admin ownership of one or more group. Please delete those groups first and try again")
+        return redirect('user')
     return redirect('index')
 
 
@@ -204,7 +228,7 @@ def groupadmintask(request,group_id,admin=False,*args,**kwargs):
             if form.is_valid():
                 code =func.GenerateJoinCode(group,role=form.cleaned_data['role'],maxno=form.cleaned_data['maxno'])
                 messages.success(request,'Join code generated: '+code.code)
-        elif task == "leave_group":
+        elif task == "leave_group" and role != "admin":
             appmodels.UserGroupLink.objects.get(group_id=group.id,user_id=request.user.id).delete()
             messages.success(request,"Successfully left "+group.group_name+". To rejoin, another join code must be issued.")
             return redirect('index')
@@ -237,8 +261,10 @@ def groupadmintask(request,group_id,admin=False,*args,**kwargs):
     # This tells the browser not to render a new page or change the URL which means that users appear to not leave the admin page
 
 def register(request):
-    
-    if request.method == 'POST':
+    if request.user.is_authenticated:
+        return redirect('index')
+        
+    elif request.method == 'POST':
         form = appforms.UserCreationForm(request.POST)
         if form.is_valid():
             form.save()

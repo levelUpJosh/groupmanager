@@ -36,20 +36,12 @@ def GetAllUserMembers(search):
 	else:
 		return 'Unsupported object type. Please input a User or Member object.'
 
-""" def GetAllUserGroups(search):
-	if search.__class__.__name__ == 'User':
-		grouplist= appmodels.UserGroupLink.objects.filter(user_id=search.pk)
-		grouplist = appmodels.Group.objects.filter(pk__in=memberlist.all().values_list('group_id'))
-		return grouplist
-	elif search.__class__.__name__=='Group':
-		userlist = appmodels.UserGroupLink.objects.filter(group_id=search.pk)
-		userlist = appmodels.User.objects.filter(pk__in=memberlist.all().values_list('group_id'))
-	else:
-		return 'Unsupported object type. Please input a User object.' """
-
 def GetAllMemberGroups(search,by_group=False):
 	from  itertools import chain 
-	#Despite the name, this function supports both members and users. The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
+	#Despite the name, this function supports both members and users.
+	#The object's type is detected and if it is a user then the function scans and returns ALL associated member groups.
+
+	#Detect if the group type provided is a 'User' object
 	if search.__class__.__name__ == 'User':
 		#print('user')
 		#First get a QuerySet of all the Members attached to the User
@@ -61,23 +53,22 @@ def GetAllMemberGroups(search,by_group=False):
 
 		#iterate through the search to get all groups for all members and make a list
 		for member in search:
-			#print(member)
-			grouplist = appmodels.MemberGroupLink.objects.filter(member_id=member.id)
-			grouplist = appmodels.Group.objects.filter(pk__in=grouplist.all().values_list('group_id'))
-			membertrack += [[member,grouplist]]
+			#Make use of the fact that this function has code that handles individual member queries (see the next 'elif' statement)
+			#Therefore just get the output for each member and make a list
+			membertrack += [GetAllMemberGroups(member)]
 		if by_group == True:
-			#If request, we want to sort the current list so that Members are grouped by their Group, rather than the other way around 
+			#If by_group == True, we want to sort the current list so that Members are grouped by their Group, rather than the default which is the other way around 
 			for item in membertrack:
 				member = item[0]
 				#iterate through the previous list made
-				#print(item[1].all())
+
 				if not item[1]:
-					#Retrospectively add in a 'No Group' entry for items with empty grouplist QuerySet objects
+					#Add in a 'No Group' entry for items with empty grouplist QuerySet objects
 					item[1] = ['No Group']
 				for group in item[1]:
 					#Iterate through each group in a member's list
 					if group in chain(*grouptrack):
-						#check if the group is already entered
+						#check if the group is already entered elsewhere
 						for i in range(0,len(grouptrack)):
 							#find where the Group is entered
 							try:
@@ -85,7 +76,7 @@ def GetAllMemberGroups(search,by_group=False):
 								location = i
 							except:
 								pass
-						#append the member to the correct location
+						#append the member to the correct location with the existing group or as a new entry
 						grouptrack[location][1].append(member)
 						
 						
@@ -99,8 +90,10 @@ def GetAllMemberGroups(search,by_group=False):
 			
 			return grouptrack
 			#print(membertrack)
+
+	#Detect if the object provided is a member and so we only need to create a simple query
 	elif search.__class__.__name__ == 'Member':
-		#print('member')
+		
 		grouplist = appmodels.MemberGroupLink.objects.filter(member_id=search.pk)
 		grouplist = appmodels.Group.objects.filter(pk__in=grouplist.all().values_list('group_id'))
 		#print(grouplist.first().group_id,flush=True)
@@ -111,16 +104,18 @@ def GetAllMemberGroups(search,by_group=False):
 	return membertrack
 
 def GetAllMembersInGroup(search):
+	#This function gets all members that are linked to a specific Group
+	#It's implemented on the GroupAdmin dashboard
 	if search.__class__.__name__ == 'Group':
-		#print('member')
 		memberlist = appmodels.MemberGroupLink.objects.filter(group_id=search.pk)
 		memberlist = appmodels.Member.objects.filter(pk__in=memberlist.all().values_list('member_id'))
-		#print(grouplist.first().group_id,flush=True)
 		return memberlist
 	else:
 		return 'Unsupported object type. Please input a Group object'
 def GetAllUserGroups(search):
+	#Similar to GetAllMembersInGroup but instead returns either all Groups a User is linked to or vice versa.
 	returnlist = []
+	#If search is a User object then find all Groups that User has a role in (admin/leader)
 	if search.__class__.__name__ == 'User':
 		grouplist= appmodels.UserGroupLink.objects.filter(user_id=search.pk)
 		for link in grouplist:
@@ -128,6 +123,7 @@ def GetAllUserGroups(search):
 			group = appmodels.Group.objects.get(pk=link.group_id)
 			returnlist += [[group,role]]
 		return returnlist
+	#If search is a Group object then find all Users that have a role in that Group
 	elif search.__class__.__name__ == 'Group':
 		userlist = appmodels.UserGroupLink.objects.filter(group_id=search.pk)
 		for link in userlist:
@@ -138,6 +134,20 @@ def GetAllUserGroups(search):
 	else:
 		return 'Unsupported object type. Please input a User or Group object.'
 
+def UserIsAdmin(user):
+	admin = False
+	usergroups = GetAllUserGroups(user)
+	for link in usergroups:
+		if link[1] == "admin":
+			admin = True
+	return admin
+def IsUsernameFree(username):
+	try:
+		appmodels.User.objects.get(username=username)
+		free = False
+	except:
+		free = True
+	return free
 def CheckJoinCodeExists(code):
 	#Checks for and returns the JoinCode onject
 	try:
@@ -154,11 +164,9 @@ def CheckJoinCodeNotUsed(member,group):
 			appmodels.MemberGroupLink.objects.get(group=group,member=member)
 		if inputObjectType == 'User':
 			appmodels.UserGroupLink.objects.get(group=group,user=member)
-		print('exist')
 		return False
 	except:
 	 	return True 
-	 	print('no exist')
 def GenerateJoinCode(group,role='member',maxno=1):
 	letters = string.ascii_uppercase
 	#An odd issue of using random sequences of the full alphabet is that there is a small chance that the code could spell out words, some of which groups may not wish to distribute to parents.

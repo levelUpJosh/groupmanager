@@ -10,6 +10,7 @@ urlpatterns = [
     path('addmember/', views.add_member, name="addmember"),
     path('addgroup/', views.add_group, name="addgroup"),
     path('joingroup/', views.join_group, name="joingroup"),
+    path('user/', views.userprofile, name="user"),
     path('member/<int:member_id>/', views.memberprofile, name="member"),
     path('<str:objectType>/<int:object_id>/delete/', views.delete_view, name='deleteobject'),
     path('group/<int:group_id>/', views.groupprofile, name="group"),

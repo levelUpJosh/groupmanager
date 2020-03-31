@@ -38,11 +38,12 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
+          {% if user.is_authenticated%}
             <li class="nav-item active">
               <a class="nav-link" href="/app/">Overview <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Profile</a>
+              <a class="nav-link" href="{% url 'user'%}">Profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'addmember'%}">Add Member</a>
@@ -55,11 +56,17 @@
               </div>
             </ul>
           </ul>
-          {% if user.is_authenticated%}
           <form class="form-inline my-2 my-lg-0" action="{% url 'logout'%}" method="POST">
             {% csrf_token %}
             <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Log Out</button>
           </form>
+          {% else %}
+            <li class="nav-item active">
+              <a class="nav-link" href="/app/login">Login <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="/app/register">Register</a>
+            </li>
           {% endif%}
         </div>
       </nav>
