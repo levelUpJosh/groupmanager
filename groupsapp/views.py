@@ -43,9 +43,9 @@ def login(request):
     return render(request, 'groupsapp/login.html', {'form': form})
 
 def logoutpage(request):
-    if request.method ==  'POST':
+    if request.method ==  'POST' and request.user.is_authenticated:
         logout(request)
-        # Redirect
+        messages.success(request,'User logged out')
         return redirect('index')
 
 def index(request):
@@ -86,11 +86,16 @@ def memberprofile(request,member_id,group_id=None):
                 form = appforms.MemberCreationForm(request.POST, instance=member)
                 if form.is_valid():
                     form.save()
+            if owned_by_user:
+                users = request.user
+            else:
+                users = func.GetAllUserMembers(member)
             form = appforms.MemberCreationForm(instance=member)
             context = {
                 'member': member,
                 'owned_by_user': owned_by_user,
                 'owned_by_group': owned_by_group,
+                'users': users,
                 'group_id': group_id, # This exists to allow us to prevent admins of one group removing a member from another
                 'groups': func.GetAllMemberGroups(member)[1],
                 'form': form
@@ -156,6 +161,8 @@ def groupprofile(request,group_id):
         else:
             messages.error(request, "Access Denied or Group Not Found")
             return redirect('index')
+    else:
+        return redirect('login')
 
 
 def groupadmin(request,group_id):
@@ -182,6 +189,7 @@ def groupadmin(request,group_id):
                     'role': users[i][1],
                 }
                 return render(request,'groupsapp/objects/group/admin.html',context=context)
+    messages.error(request,'Access Denied: Only Admins & Leaders can access this page')
     return redirect('index')
 
 
