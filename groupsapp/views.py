@@ -67,9 +67,18 @@ def index(request):
 def userprofile(request):
     if request.user.is_authenticated:
         user = request.user
+        if request.method == "POST":
+            ### I attempted to make it possible for users to edit their own username and email.
+            ### It proved more difficult than i expected so this currently does not work.
+            form = appforms.UserCreationForm(data=request.POST,instance=user)
+            if form.is_valid():
+                form.save()
+        else:
+            form = appforms.UserCreationForm(instance=user)
         context = {
             'user': user,
             'groups': func.GetAllUserGroups(user),
+            'form': form,
         }
         return render(request,'groupsapp/objects/user/profile.html',context=context)
     else:
@@ -335,7 +344,7 @@ def join_group(request,error=''):
                     code = func.UseJoinCode(code,request.user)
                     
                 if code != True:
-                    error = code
+                    messages.error(request,code)
                     form = appforms.JoinCodeForm(request=request)
                 else:
                     messages.success(request,'Group joined')

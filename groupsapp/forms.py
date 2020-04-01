@@ -28,21 +28,28 @@ class UserCreationForm(contribforms.UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
         self.user = kwargs.get('instance')
+        print(self.user)
 
     def clean(self):
         username = self.cleaned_data["username"]
         email = self.cleaned_data["email"]
         dob = self.cleaned_data.get("dob")
+        #Enforcing the minimum age of 18, but only if dob is given.
+        #dob would not be given when editing the User Profile because it is only checked when registering an account.
         if dob and (18 > ((datetime.date.today() - dob).days)/365.25):
             raise forms.ValidationError({'dob': ["Users must be at least 18 years old due to data consent laws",]})
         if self.user:
-            #If user is not given then exclude user id = 0 which will not affect the query
+            #When editing an existing user, the program uses the user id to exclude the current username and email from checks for existing records
             user_id = self.user.id
         else:
+            #If user is not given then this tells the program it is not dealing with an existing user.
+            #This means that username should not beconsidered in the filter lines below when registering a new user.
             user_id = 0
+        
         if not func.ValidateName(username):
             raise forms.ValidationError({'username': ["Name has invalid characters",]})
         if appmodels.User.objects.filter(username=username).exclude(id=user_id).exists():
+
             raise forms.ValidationError({'username': ["Username is not available",]})
         if appmodels.User.objects.filter(email=email).exclude(id=user_id).exists():
             raise forms.ValidationError({'email': ["Email is already taken",]})
@@ -92,8 +99,6 @@ class MemberCreationForm(forms.ModelForm):
             raise forms.ValidationError('Invalid characters') 
         if dob > datetime.date.today():
             raise forms.ValidationError({'dob': ["Birthday cannot be in the future",]})
-        if gender == "U":
-            raise forms.ValidationError({'gender': ["Please choose Male/Female/Other,"]})
     class Meta:
         model = appmodels.Member
         fields = ["first_name","last_name","dob","gender"]
@@ -135,30 +140,30 @@ class JoinCodeForm(forms.Form):
             self.user = kwargs.pop('request').user
             if self.user:
                 queryset = self.GetChoices()
-        if kwargs.get('error'):
-            raise forms.ValidationError(kwargs.pop('error'))
         super(JoinCodeForm, self).__init__(*args, **kwargs)
         
         self.fields['member'].queryset = queryset
 
     def GetChoices(self):
         members= func.GetAllUserMembers(self.user)
-        print(members)
         return members
     
     def clean(self):
         cleaned_data = super(JoinCodeForm, self).clean()
         code = cleaned_data.get('code')
+        # If first letter is 'M'
         if code[0] == "M":
             member = cleaned_data.get('member')
+        #Length must be exactly 8 characters
         if len(code) != 8:
             raise forms.ValidationError('Code must be 8 characters long')
+        #Code field must be populated
         if not code:
             raise forms.ValidationError('Empty code')
+        #Code must only have letters
         if not func.ValidateName(code):
             raise forms.ValidationError('Invalid characters')
-        #if error != True:
-            #raise forms.ValidationError(error)
+
 
 class NewJoinCodeForm(forms.Form):
     maxno = forms.IntegerField(min_value=1)

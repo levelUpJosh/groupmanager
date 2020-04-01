@@ -19,7 +19,6 @@ class Member(models.Model):
     ('M', 'Male'),
     ('F', 'Female'),
     ('O', 'Other'),
-    ('U','Unknown: Not Set')
     ]
     gender = e_models.EncryptedCharField(max_length=1,choices=GENDER_CHOICES,default='U')
 
