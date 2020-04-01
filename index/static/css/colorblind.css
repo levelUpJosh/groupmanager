@@ -1,0 +1,43 @@
+.scoutred{
+}
+.scoutpurple{
+    background-color: black;
+    color: white;
+  }
+.scoutpurple-opacity{
+    background-color: black;
+    color: white;
+}
+.scoutgreen, .cubgreen{
+    background-color: black;
+    color: white;
+}
+.scoutgreen-opacity{
+    background-color: black;
+    color: white;
+}
+.scoutblue, .beaverblue{
+    background-color: black;
+    color: white;
+}
+.scoutblue a, .beaverblue a, .scoutgreen a, .cubgreen a,.scoutred a{
+    color: white;
+}
+
+
+.scoutonlygreen{
+    background-color: black;
+    color: white;
+}
+.scoutnavy, .explorernavy{
+    background-color: black;
+    color: white;
+}
+.scoutblack, .networkblack{
+    color: white;
+    background-color: black;
+}
+.white{
+    background-color: white;
+    color: black
+}
