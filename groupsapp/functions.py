@@ -140,14 +140,7 @@ def GetAllUserGroups(search):
 	else:
 		return 'Unsupported object type. Please input a User or Group object.'
 
-def UserIsAdmin(user):
-	#Returns True if the given user has the 'admin' role and False if it is not linked or only a 'leader'.
-	admin = False
-	usergroups = GetAllUserGroups(user)
-	for link in usergroups:
-		if link[1] == "admin":
-			admin = True
-	return admin
+
 
 def CheckJoinCodeExists(code):
 	#Checks for and returns the JoinCode onject
@@ -262,3 +255,12 @@ def ValidateName(name,digits=False):
 		return False
 	else:
 		return True
+
+def UserIsAdmin(user):
+	#Returns True if the given user has the 'admin' role in ANY group and False if it is not linked or only a 'leader'.
+	admin = False
+	usergroups = GetAllUserGroups(user)
+	for link in usergroups:
+		if link[1] == "admin":
+			admin = True
+	return admin
