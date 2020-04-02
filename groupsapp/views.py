@@ -115,10 +115,6 @@ def memberprofile(request,member_id,group_id=None):
     else:
         return redirect('login')
 
-def memberprofiletask(request,member_id,*args,**kwargs):
-    return HttpResponse(status=204)
-
-
 def delete_view(request,object_id,objectType):
     if request.user.is_authenticated and request.method == "POST":
         if objectType == "member":
@@ -132,7 +128,6 @@ def delete_view(request,object_id,objectType):
                 if not func.UserIsAdmin(request.user):
                     
                     for member in func.GetAllUserMembers(request.user):
-                        print(member)
                         member.delete()
                     appmodels.User.objects.get(id=object_id).delete()
                     messages.success(request,'User deleted')
